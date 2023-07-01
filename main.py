@@ -34,7 +34,7 @@ def main():
             # Print the QR code values
             if qr_code_values != None:
                 print("QR Code values:", qr_code_values)
-                scan = False
+                scan = False  # Stop scanner if detected
 
         # Exit if 'q' is pressed
         if cv2.waitKey(1) & 0xFF == ord('q'):
