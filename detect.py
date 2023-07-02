@@ -1,23 +1,6 @@
 import cv2
 from pyzbar import pyzbar
 
-"""
-def decode_qr_code(frame):
-    # Create a QRCodeDetector object
-    qr_detector = cv2.QRCodeDetector()
-
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-    # Detect and decode QR codes in the frame
-    decoded_val, points, _ = qr_detector.detectAndDecode(gray)
-
-    # Extract and return the QR code values
-    if decoded_val:
-        return decoded_val
-    else:
-        return None
-"""
-    
 def decode_ticket(frame):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
