@@ -3,8 +3,12 @@ from barcode import Code128
 from barcode.writer import ImageWriter
 
 def gen(codes:list, folder_path='./barcodes/'):
-    folder_path = './'+folder_path+'/' if os.path.isdir(folder_path) else folder_path
-
+    folder_path = './'+folder_path+'/' if not(os.path.isdir(folder_path)) else folder_path
+    try:
+        os.mkdir(folder_path)
+        print(f"Folder '{folder_path}' created successfully.")
+    except:
+        pass
     # (optional) font_path: path to font file to be used
     # Use PIL to set transparent (1) Switch mode to RGBA, (2) set alpha = 0 - 255, (3) 
     ren = ImageWriter(format='PNG', mode='RGBA')
