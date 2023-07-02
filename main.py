@@ -1,18 +1,5 @@
 import cv2
-
-def decode_qr_code(frame):
-    # Create a QRCodeDetector object
-    qr_detector = cv2.QRCodeDetector()
-
-    # Detect and decode QR codes in the frame
-    decoded_val, points, _ = qr_detector.detectAndDecode(frame)
-
-    # Extract and return the QR code values
-    if decoded_val:
-        return decoded_val
-    else:
-        return None
-
+from detect import *
 
 def main():
     # Open the video capture
@@ -29,7 +16,7 @@ def main():
             cv2.imshow("Video", frame)
 
             # Detect QR codes and get their values
-            qr_code_values = decode_qr_code(frame)
+            qr_code_values = decode_ticket(frame)
             
             # Print the QR code values
             if qr_code_values != None:
