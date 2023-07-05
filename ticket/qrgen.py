@@ -1,6 +1,7 @@
 import os
 from qrcode import QRCode
 from qrcode.constants import ERROR_CORRECT_H, ERROR_CORRECT_L, ERROR_CORRECT_M, ERROR_CORRECT_Q
+from PIL import Image
 
 def gen(codes:list, folder_path='./qrcodes/'):
     folder_path = './'+folder_path+'/' if not(os.path.isdir(folder_path)) else folder_path
@@ -30,8 +31,25 @@ def gen(codes:list, folder_path='./qrcodes/'):
         ren.add_data(code)  # Adding data for encoding
         ren.make(fit=True)
 
-        img = ren.make_image()
-        img.save(file_path)
+        img = ren.make_image(fill_color="black", back_color="white")
+        
+        
+        # Converting to transparent background
+        img = img.convert("RGBA")
+        
+        datas = img.getdata()
+        new_data = []
+        
+        for item in datas:
+            # Set the white pixels as transparent
+            if item[:3] == (255, 255, 255):
+                new_data.append((255, 255, 255, 0))
+            else:
+                new_data.append(item)
+        
+        img.putdata(new_data)
+
+        img.save(file_path, "PNG")
 
         ren.clear()  # Reset attribute
 
