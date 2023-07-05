@@ -15,3 +15,13 @@ def decode_ticket(frame):
 
     if decoded_data:
         return decoded_data
+
+def draw(frame):
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    decoded_obj = pyzbar.decode(gray)
+
+    for obj in decoded_obj:
+        x, y, w, h = obj.rect
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+    
+    return None
