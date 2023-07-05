@@ -2,6 +2,9 @@ import cv2
 from pyzbar import pyzbar
 
 def decode_ticket(frame):
+    """
+    Take a frame read from OpenCV, decode and return the values as a list.
+    """
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     codes = pyzbar.decode(gray)
@@ -17,6 +20,9 @@ def decode_ticket(frame):
         return decoded_data
 
 def draw(frame):
+    """
+    Draw a green box around detected QR/Barcode to the imported frame.
+    """
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     decoded_obj = pyzbar.decode(gray)
 
