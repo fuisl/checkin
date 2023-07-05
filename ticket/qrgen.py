@@ -34,3 +34,5 @@ def gen(codes:list, folder_path='./qrcodes/'):
         img.save(file_path)
 
         ren.clear()  # Reset attribute
+
+    print(f'{len(codes)} QRCodes created successfully!')

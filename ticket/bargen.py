@@ -22,3 +22,5 @@ def gen(codes:list, folder_path='./barcodes/'):
     for code in codes:
         with open(folder_path+code+'.png', 'wb') as f:
             Code128(code, writer=ren).write(f, options=barcode_options)
+
+    print(f'{len(codes)} BarCodes created successfully!')
