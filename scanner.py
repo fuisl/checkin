@@ -9,6 +9,7 @@ def main():
     print(url)
     video_capture = cv2.VideoCapture(url)
     
+    # Check if remote camera is opened, if not, switch to default camera.
     if video_capture.isOpened():
         print("Connected successfully")
     else:
@@ -17,6 +18,10 @@ def main():
         if not video_capture.isOpened():
             print("Failed to connect to default camera!")
             exit()
+
+    # Camera settings
+    video_capture.set(cv2.CAP_PROP_FPS, 5)
+
 
     paused = False
     # Executing scanner
@@ -35,8 +40,9 @@ def main():
                 
                 # Print the QR code values
                 if qr_code_values != None:
-                    print("QR Code values:", qr_code_values)
-                    paused = True
+                    print(qr_code_values)
+
+                    #paused = True
       
         key = cv2.waitKey(1)
         # Exit if 'q' is pressed
