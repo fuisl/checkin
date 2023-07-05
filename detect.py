@@ -10,9 +10,7 @@ def decode_ticket(frame):
         
     for code in codes:
         data = code.data.decode("utf-8")
-        data_type = code.type
-        print(f"QR Code: {data}, Type: {data_type}")
-
+        
         decoded_data.append(data)
 
     if decoded_data:
