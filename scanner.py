@@ -32,8 +32,12 @@ def main():
 
             # If the frame was read successfully
             if ret:
+                # Draw a box around detected code
+                draw(frame)
+
                 # Display the frame
                 cv2.imshow("Video", frame)
+
 
                 # Detect QR codes and get their values
                 qr_code_values = decode_ticket(frame)
@@ -45,11 +49,9 @@ def main():
                     #paused = True
       
         key = cv2.waitKey(1)
-        # Exit if 'q' is pressed
-        if key == ord('q'):
+        # Exit if 'ESC' is pressed
+        if key == 27:
             break
-        elif key == ord('c'):
-            paused = not paused
 
     # Release the video capture and close the windows
     video_capture.release()
