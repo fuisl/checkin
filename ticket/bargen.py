@@ -4,6 +4,15 @@ from barcode.writer import ImageWriter
 from PIL import Image
 
 def gen(codes:list, folder_path='./barcodes/'):
+    """
+    Generate barcode using Code 128 from a list of codes and
+    export to a destinated folder, if not exist, automatically
+    create one.
+
+    If files exist, replace the duplicate files.
+
+    (optional) Transparent barcode
+    """
     folder_path = './'+folder_path+'/' if not(os.path.isdir(folder_path)) else folder_path
     try:
         os.mkdir(folder_path)

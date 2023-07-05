@@ -4,6 +4,15 @@ from qrcode.constants import ERROR_CORRECT_H, ERROR_CORRECT_L, ERROR_CORRECT_M, 
 from PIL import Image
 
 def gen(codes:list, folder_path='./qrcodes/'):
+    """
+    Generate barcode using QRCode from a list of codes and
+    export to a destinated folder, if not exist, automatically
+    create one.
+
+    If files exist, replace the duplicate files.
+
+    (optional) Transparent QRCode
+    """
     folder_path = './'+folder_path+'/' if not(os.path.isdir(folder_path)) else folder_path
     try:
         os.mkdir(folder_path)
