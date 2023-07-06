@@ -85,7 +85,8 @@ if __name__ == "__main__":
 
         print("Connecting to default camera...")
         video_capture = cv2.VideoCapture(0)
-        # Camera settings
-        video_capture.set(cv2.CAP_PROP_FPS, 5)
-    
+        
+    # Camera settings
+    video_capture.set(cv2.CAP_PROP_FPS, 5)
+
     main()
