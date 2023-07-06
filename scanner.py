@@ -26,32 +26,34 @@ def main():
     paused = False
     # Executing scanner
     while True:
-        if not paused:
+            
         # Read a frame from the video capture
-            ret, frame = video_capture.read()
+        ret, frame = video_capture.read()
 
-            # If the frame was read successfully
-            if ret:
-                # Draw a box around detected code
-                draw(frame)
+        # If the frame was read successfully
+        if ret:
+            # Draw a box around detected code
+            draw(frame)
 
-                # Display the frame
-                cv2.imshow("Video", frame)
+            # Display the frame
+            cv2.imshow("Video", frame)
 
 
-                # Detect QR codes and get their values
-                qr_code_values = decode_ticket(frame)
-                
-                # Print the QR code values
-                if qr_code_values != None:
-                    print(qr_code_values)
+            # Detect QR codes and get their values
+            qr_code_values = decode_ticket(frame)
+            
+            # Print the QR code values
+            if qr_code_values != None and paused == False:
+                print(qr_code_values)
+                paused = True
 
-                    #paused = True
       
         key = cv2.waitKey(1)
         # Exit if 'ESC' is pressed
         if key == 27:
             break
+        elif key == 48:  # Continue if "0" is pressed
+            paused = False
 
     # Release the video capture and close the windows
     video_capture.release()
