@@ -87,4 +87,5 @@ if __name__ == "__main__":
         video_capture = cv2.VideoCapture(0)
         # Camera settings
         video_capture.set(cv2.CAP_PROP_FPS, 5)
-        main()
+    
+    main()
