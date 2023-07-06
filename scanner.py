@@ -1,28 +1,34 @@
 import cv2
 from detect import *
+import sys
+import re
 
-def main():
+def is_valid_ip(address):
+    pattern = r'^((([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\.){3}([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5]))$'
+    return re.match(pattern, address) is not None
+
+arguments = sys.argv[1:]
+
+# Exit if provided more than 1 argument
+if len(arguments) > 1:
+    print("Usage: py scanner.py <ip address>")
+    sys.exit(1)
+
+# Exit if not a valid IP Address
+if len(arguments) == 1:
+    if not is_valid_ip(arguments[0]):
+        raise ValueError("Not an IP Address!")
+
+
+def url_camera(wifi_ip):
     # Open the video capture
-    wifi_ip = '172.16.133.112'
     port = '4747'
     url = 'http://' + wifi_ip + ':' + port + '/video'
     print(url)
-    video_capture = cv2.VideoCapture(url)
-    
-    # Check if remote camera is opened, if not, switch to default camera.
-    if video_capture.isOpened():
-        print("Connected successfully")
-    else:
-        print("Failed to connect to the camera. Switching to default camera...")
-        video_capture = cv2.VideoCapture(0)
-        if not video_capture.isOpened():
-            print("Failed to connect to default camera!")
-            exit()
-
-    # Camera settings
-    video_capture.set(cv2.CAP_PROP_FPS, 5)
+    return url
 
 
+def main():
     paused = False
     # Executing scanner
     while True:
@@ -60,4 +66,25 @@ def main():
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    main()
+    if len(arguments) > 0:
+
+        print("Connecting to remote camera...")
+        video_capture = cv2.VideoCapture(url_camera(arguments[0]))  # Connect to a remote camera using its IP Address
+        
+        # Check if remote camera is opened, if not, switch to default camera.
+        if video_capture.isOpened():
+            print("Connected successfully")
+        else:
+            print("Failed to connect to camera. Switching to default camera...")
+            video_capture = cv2.VideoCapture(0)
+            if not video_capture.isOpened():
+                print("Failed to connect to default camera!")
+                exit()
+
+    if len(arguments) == 0:
+
+        print("Connecting to default camera...")
+        video_capture = cv2.VideoCapture(0)
+        # Camera settings
+        video_capture.set(cv2.CAP_PROP_FPS, 5)
+        main()
