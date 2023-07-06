@@ -1,0 +1,4 @@
+explore.ipynb
+*.png
+__pycache__/
+*.pdf
