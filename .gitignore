@@ -2,3 +2,5 @@ explore.ipynb
 *.png
 __pycache__/
 *.pdf
+test/
+example_list.csv
