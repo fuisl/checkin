@@ -3,6 +3,7 @@ from detect import *
 import sys
 import re
 
+# Check if a string is a valid IP Address
 def is_valid_ip(address):
     pattern = r'^((([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\.){3}([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5]))$'
     return re.match(pattern, address) is not None
