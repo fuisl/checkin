@@ -53,12 +53,13 @@ class CheckIn:
 
     def get_info(self, code) -> pd.DataFrame:
         """
-        Print 
+        Print info
         """
         if self.check(code):
-            temp = self.df_input[self.df[self.df['codes'] == code]['id']]
-            print(temp)
-            return temp
+            temp = self.df[self.df['codes'].apply(lambda x: code in x)]['id'].to_list()
+            print(temp[0], type(temp[0]))
+            info = self.df_input[self.df_input['id'] == temp[0]]
+            return info
 
 class Gen:
     def __init__(self, df_input: pd.DataFrame, event_code) -> None:
