@@ -57,7 +57,6 @@ class CheckIn:
         """
         if self.check(code):
             temp = self.df[self.df['codes'].apply(lambda x: code in x)]['id'].to_list()
-            print(temp[0], type(temp[0]))
             info = self.df_input[self.df_input['id'] == temp[0]]
             return info
 
