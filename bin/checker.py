@@ -34,26 +34,32 @@ class CheckIn:
         elif file.lower().endswith('.csv'):
             self.df_input = pd.read_csv(file)
 
-        self.event_code = event_code  # Set event code if provided
+        # Dataframe use for checking
+        self.df = self._add_code(self.df_input, event_code)
     
-    def check(self, code) -> bool:
-        raise NotImplementedError
+    def check(self, code: str) -> bool:
+        if code in self.df['codes'].values:
+            return True
         
-    def _clean(self, df) -> pd.DataFrame:
-        raise NotImplementedError
+        return False
+    
+    def _add_code(self, df_input, event_code) -> pd.DataFrame:
+        generator = Gen(df_input, event_code)
+
+        return generator._exploded()
     
     def _export(self):
         raise NotImplementedError
     
 class Gen:
-    def __init__(self, event_code, input_df: pd.DataFrame) -> None:
+    def __init__(self, df_input: pd.DataFrame, event_code) -> None:
         """
         DataFrame must includes:
             - id: id of individuals
             - quantity: number of tickets each individual bought
         """
         
-        self.df = input_df
+        self.df = df_input
         
         # Generate codes and assign code to data
         codes = generate_ticket_code(self.df['quantity'].sum(), seed=event_code)
