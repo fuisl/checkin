@@ -28,6 +28,6 @@ def draw(frame):
 
     for obj in decoded_obj:
         x, y, w, h = obj.rect
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
     
     return None
