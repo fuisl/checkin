@@ -8,7 +8,7 @@ from ticket.codegen import generate_ticket_code
 from ticket import qrgen, bargen
 
 class CheckIn:
-    def __init__(self, file:str, url=None, sheet=None, event_code=None) -> None:
+    def __init__(self, file:str, url=None, sheet=None, event_code='presto') -> None:
         """
         Check for code in database
 
@@ -50,7 +50,16 @@ class CheckIn:
     
     def _export(self):
         raise NotImplementedError
-    
+
+    def get_info(self, code) -> pd.DataFrame:
+        """
+        Print 
+        """
+        if self.check(code):
+            temp = self.df_input[self.df[self.df['codes'] == code]['id']]
+            print(temp)
+            return temp
+
 class Gen:
     def __init__(self, df_input: pd.DataFrame, event_code) -> None:
         """
@@ -62,7 +71,7 @@ class Gen:
         self.df = df_input
         
         # Generate codes and assign code to data
-        codes = generate_ticket_code(self.df['quantity'].sum(), seed=event_code)
+        self.codes = generate_ticket_code(self.df['quantity'].sum(), seed=event_code)
 
         # Slicing codes for individuals
         index = self.df['quantity'].cumsum()
@@ -71,7 +80,7 @@ class Gen:
         start = 0  # Initializing start index
 
         for stop in index:
-            code_cut = codes[start:stop]  # List slicing and append to new list.
+            code_cut = self.codes[start:stop]  # List slicing and append to new list.
             start = stop  # Update new start
             code_list.append(code_cut)
 
@@ -86,3 +95,22 @@ class Gen:
         set methods to change some settings
         """
         pass
+
+    def encode(self, type='qr', transparent=False, custom_path=None):
+        """
+        Encode codes into QRCode/Barcode.
+
+        Parameters:
+        :type -> qr or bar.
+        :transparent -> settings for transparent background.
+        :custom_path -> path folder to export encoded files.
+        """
+        # Set path if not provided
+        if custom_path == None:
+            custom_path = './qrcodes/' if type=='qr' else './barcodes/'
+        
+        # Call generator
+        if type == 'qr':
+            qrgen.gen(self.codes, custom_path, transparent)  # TODO: restructure qrgen for transparent option
+        elif type == 'bar':
+            bargen.gen(self.codes, custom_path, transparent)  # TODO: restructure bargen for transparent option
