@@ -13,7 +13,7 @@ def gen(codes:list, folder_path='./qrcodes/', transparent=False):
 
     (optional) Transparent QRCode
     """
-    folder_path = './'+folder_path+'/qrcodes/' if not(os.path.isdir(folder_path)) else folder_path
+    folder_path = './'+folder_path+'/qrcodes/' if not(os.path.isdir(folder_path)) else folder_path+'/qrcodes'
     try:
         os.mkdir(folder_path)
         print(f"Folder '{folder_path}' created successfully.")

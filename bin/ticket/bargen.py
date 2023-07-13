@@ -13,7 +13,7 @@ def gen(codes:list, folder_path='./barcodes/', transparent=False):
 
     (optional) Transparent barcode
     """
-    folder_path = './'+folder_path+'/barcodes' if not(os.path.isdir(folder_path)) else folder_path
+    folder_path = './'+folder_path+'/barcodes' if not(os.path.isdir(folder_path)) else folder_path+'/barcodes'
     try:
         os.mkdir(folder_path)
         print(f"Folder '{folder_path}' created successfully.")
