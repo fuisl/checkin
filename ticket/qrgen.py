@@ -3,7 +3,7 @@ from qrcode import QRCode
 from qrcode.constants import ERROR_CORRECT_H, ERROR_CORRECT_L, ERROR_CORRECT_M, ERROR_CORRECT_Q
 from PIL import Image
 
-def gen(codes:list, folder_path='./qrcodes/'):
+def gen(codes:list, folder_path='./qrcodes/', transparent=False):
     """
     Generate barcode using QRCode from a list of codes and
     export to a destinated folder, if not exist, automatically
@@ -42,21 +42,21 @@ def gen(codes:list, folder_path='./qrcodes/'):
 
         img = ren.make_image(fill_color="black", back_color="white")
         
-        
-        # Converting to transparent background
-        img = img.convert("RGBA")
-        
-        datas = img.getdata()
-        new_data = []
-        
-        for item in datas:
-            # Set the white pixels as transparent
-            if item[:3] == (255, 255, 255):
-                new_data.append((255, 255, 255, 0))
-            else:
-                new_data.append(item)
-        
-        img.putdata(new_data)
+        if transparent:
+            # Converting to transparent background
+            img = img.convert("RGBA")
+            
+            datas = img.getdata()
+            new_data = []
+            
+            for item in datas:
+                # Set the white pixels as transparent
+                if item[:3] == (255, 255, 255):
+                    new_data.append((255, 255, 255, 0))
+                else:
+                    new_data.append(item)
+            
+            img.putdata(new_data)
 
         img.save(file_path, "PNG")
 
