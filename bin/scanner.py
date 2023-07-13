@@ -2,6 +2,7 @@ import cv2
 from detect import *
 import sys
 import re
+from checker import *
 
 # Check if a string is a valid IP Address
 def is_valid_ip(address):
@@ -30,6 +31,8 @@ def url_camera(wifi_ip):
 
 
 def main():
+    checker = CheckIn('tests\example_list.csv', event_code='prom-test')
+
     paused = False
     # Executing scanner
     while True:
@@ -51,10 +54,14 @@ def main():
             
             # Print the QR code values
             if qr_code_values != None and paused == False:
-                print(qr_code_values)
+                if checker.check(qr_code_values[0]):
+                    print('Code found')
+                    print(checker.get_info(qr_code_values[0]))
+                else:
+                    print("Code not found")
                 paused = True
 
-      
+
         key = cv2.waitKey(1)
         # Exit if 'ESC' is pressed
         if key == 27:
