@@ -50,6 +50,9 @@ class CheckIn:
     
     def _export(self):
         raise NotImplementedError
+    
+    def _is_used() -> bool:
+        raise NotImplementedError
 
     def get_info(self, code) -> pd.DataFrame:
         """
