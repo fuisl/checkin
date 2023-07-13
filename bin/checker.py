@@ -7,21 +7,34 @@ from oauth2client.service_account import ServiceAccountCredentials
 from ticket.codegen import generate_ticket_code
 from ticket import qrgen, bargen
 
-class Check:
-    def __init__(self, file_json) -> None:
-        credentials = ServiceAccountCredentials.from_json_keyfile_name(
-            file_json, ['https://www.googleapis.com/auth/spreadsheets'])
+class CheckIn:
+    def __init__(self, file:str, url=None, sheet=None, event_code=None) -> None:
+        """
+        Check for code in database
+
+        (1) Open database (GSheet or .csv)
+            - If using GSheet as database, you need to provide url and sheet.
+        (2) Use `check()` method to check if a code is in database
+        """
         
-        self.client = gspread.authorize(credentials)
+        if file.lower().endswith('.json'):
+            # Connect to Google Sheet API
+            credentials = ServiceAccountCredentials.from_json_keyfile_name(
+                file, ['https://www.googleapis.com/auth/spreadsheets'])
+            self.client = gspread.authorize(credentials)
+            
+            self.spreadsheet_o = self.client.open_by_url(url)
+            ws = self.spreadsheet_o.worksheet(sheet)
+            
+            # Set df_input
+            list_of_dict = ws.get_all_records()
+            self.df_input = pd.DataFrame(list_of_dict)
 
-    def open(self, url) -> None:
-        self.spreadsheet_o = self.client.open_by_url(url)
 
-    def read_to_df(self, sheet: str) -> pd.DataFrame:
-        ws = self.spreadsheet_o.worksheet(sheet)
-        list_of_dict = ws.get_all_records()
+        elif file.lower().endswith('.csv'):
+            self.df_input = pd.read_csv(file)
 
-        return pd.DataFrame(list_of_dict)
+        self.event_code = event_code  # Set event code if provided
     
     def check(self, code) -> bool:
         raise NotImplementedError
@@ -33,7 +46,7 @@ class Check:
         raise NotImplementedError
     
 class Gen:
-    def __init__(self, event_code: str, input_df: pd.DataFrame) -> None:
+    def __init__(self, event_code, input_df: pd.DataFrame) -> None:
         """
         DataFrame must includes:
             - id: id of individuals
@@ -58,6 +71,12 @@ class Gen:
 
         self.df['codes'] = code_list
 
-    def exploded(self) -> pd.DataFrame:
+    def _exploded(self) -> pd.DataFrame:
         exploded_df = self.df[['id', 'codes']].explode('codes', ignore_index=1)
         return exploded_df
+    
+    def set(self, **kwargs):
+        """
+        set methods to change some settings
+        """
+        pass
