@@ -1,5 +1,5 @@
 explore.ipynb
-*.png
+tests/
 __pycache__/
 *.pdf
 test/
