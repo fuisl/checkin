@@ -4,3 +4,4 @@ python-barcode
 gspread
 oauth2client
 pillow
+face_recognition
