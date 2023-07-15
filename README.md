@@ -8,66 +8,57 @@ This system also provides a [scanner](bin/scanner.py) and [face recognition]() f
 
 ## Features
 
-These below are main features of the system.
+The Tickting System offers the following key features:
 
 ### Seed generated codes
 
-For each unique event, the system can generate unique codes and assign to each unique ID with the number of codes required.
-
+For each unique event, the system can generate a set of unique codes and assign them to individual attendees.
 
 ### Scan
 
-Code scanner using [OpenCV]() library to read and preprocess image data. Then [pyzbar]()
+The system includes a code scanner that utilizes the **OpenCV** library for reading and preprocessing image data. It also incorporates the **pyzbar** library for code decoding.
 
 ### Face recognition
 
-
+> *This feature is currently under development and will be available in future updates.*
 
 ### GoogleSheetAPI
 
-By using API provided by **Google**, it provides data communication between systems. This means this system can be use with **Google Form**. 
-
-This allows:
-
-- Fetching user data from Google Sheet. 
-- Updating and Viewing data on Google Sheet.
-
-<!-- ## Demos -->
+The system leverages the GoogleSheetAPI to facilitate data communication between systems. It allows for fetching user data from Google Sheets, as well as updating and viewing data within the sheets. This integration enables the use of Google Forms with the Tickting System.
 
 ## Installation
 
 ### Requirements
 
 - Python 3.x
-- Windows operating system
-
-> *macOs and Linux operating system are under development*
-
-
+- Windows operating system *(macOS and Linux versions are currently in development)*
 
 ### Installation Options
 
-#### Installing on Windows
+#### Windows
 
-Install required packages using Python package controller `pip` by running the following command:
+To install the required packages, use the Python package controller `pip` and run the following command:
 
 ```bash
 pip3 install -r requirements.txt
 ```
 
-> *In case you have any trouble installing **dlib** package for **face_recognition**, please do checkout [@masoudr's Windows 10 installation guide (dlib + face_recognition)](https://github.com/ageitgey/face_recognition/issues/175#issue-257710508)*
+If you encounter any issues while installing the `dlib` package for `face_recognition`, refer to [@masoudr's Windows 10 installation guide (dlib + face_recognition)](https://github.com/ageitgey/face_recognition/issues/175#issue-257710508) for troubleshooting steps.
 
-#### Installing on Mac or Linux
+#### macOS and Linux
 
-Under Developement.
+These installation instructions are currently under development.
 
 ## Usage
 
+Usage instructions will be provided in future updates.
+
 ## Deployment to Raspberry Pi
 
-## Having problems?
+Instructions for deploying the Tickting System to a Raspberry Pi will be provided in future updates.
 
-If you run into problems, please read [Common Errors](https://github.com/fuisl/checkin/wiki/Common-Errors) section on the wifi page before filing a Github issue.
+## Troubleshooting
+
+If you encounter any problems, please refer to the [Common Errors](https://github.com/fuisl/checkin/wiki/Common-Errors) section on the wiki page before submitting a GitHub issue.
 
 ## Acknowledgement
-
