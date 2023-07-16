@@ -158,8 +158,8 @@ if __name__ == '__main__':
         biden_face_encoding
     ]
     Global.known_face_names = [
-        "Barack Obama",
-        "Joe Biden"
+        "10422021",
+        "10422082"
     ]
 
     # Create workers
