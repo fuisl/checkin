@@ -5,8 +5,15 @@ import pickle
 import face_recognition
 from face_recognition.face_recognition_cli import image_files_in_folder
 from sklearn import neighbors
+import math
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'JPG'}
+
+import sys
+arguments = sys.argv[1:]
+
+if len(arguments) < 1:
+    print("Usage: py train.py <train_directory> <model_save_path>")
 
 # Define functions
 
@@ -74,3 +81,9 @@ def train(train_dir, model_save_path=None, n_neighbors=None, knn_algo='ball_tree
 
     return knn_clf
 
+
+if __name__ == '__main__':
+    if len(arguments) == 2:
+        train(arguments[0], arguments[1])
+    else:
+        train(arguments[0])
