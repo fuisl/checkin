@@ -2,8 +2,9 @@ import os
 from barcode import Code128
 from barcode.writer import ImageWriter
 from PIL import Image
+from pathlib import Path
 
-def gen(codes:list, folder_path='./barcodes/', transparent=False):
+def gen(codes:list, folder_path=None, transparent=False):
     """
     Generate barcode using Code 128 from a list of codes and
     export to a destinated folder, if not exist, automatically
@@ -13,7 +14,9 @@ def gen(codes:list, folder_path='./barcodes/', transparent=False):
 
     (optional) Transparent barcode
     """
-    folder_path = './'+folder_path+'/barcodes' if not(os.path.isdir(folder_path)) else folder_path+'/barcodes'
+    folder_path = './barcodes/' if folder_path == None else folder_path
+    path1 = Path(folder_path)  # folder path
+    
     try:
         os.mkdir(folder_path)
         print(f"Folder '{folder_path}' created successfully.")
@@ -30,12 +33,18 @@ def gen(codes:list, folder_path='./barcodes/', transparent=False):
                        }
  
     for code in codes:
-        with open(folder_path+code+'.png', 'wb') as f:
+        file_name = Path(code+'.png')
+        file_path = path1.joinpath(file_name)
+
+        with open(file_path, 'wb') as f:
             Code128(code, writer=ren).write(f, options=barcode_options)
 
     if transparent:
         for code in codes:
-            img = Image.open(folder_path+code+'.png')
+            file_name = Path(code+'.png')
+            file_path = path1.joinpath(file_name)
+
+            img = Image.open(file_path)
 
             img = img.convert("RGBA")
 
@@ -51,6 +60,6 @@ def gen(codes:list, folder_path='./barcodes/', transparent=False):
 
             img.putdata(new_data)
 
-            img.save(folder_path+code+'.png', "PNG")
+            img.save(file_path)
 
     print(f'{len(codes)} BarCodes created successfully!')
