@@ -1,9 +1,9 @@
 import os
 from qrcode import QRCode
 from qrcode.constants import ERROR_CORRECT_H, ERROR_CORRECT_L, ERROR_CORRECT_M, ERROR_CORRECT_Q
-from PIL import Image
+from pathlib import Path
 
-def gen(codes:list, folder_path='./qrcodes/', transparent=False):
+def gen(codes:list, folder_path=None, transparent=False):
     """
     Generate barcode using QRCode from a list of codes and
     export to a destinated folder, if not exist, automatically
@@ -13,7 +13,9 @@ def gen(codes:list, folder_path='./qrcodes/', transparent=False):
 
     (optional) Transparent QRCode
     """
-    folder_path = './'+folder_path+'/qrcodes/' if not(os.path.isdir(folder_path)) else folder_path+'/qrcodes'
+    folder_path = './qrcodes/' if folder_path == None else folder_path
+    path1 = Path(folder_path)  # folder path
+
     try:
         os.mkdir(folder_path)
         print(f"Folder '{folder_path}' created successfully.")
@@ -26,7 +28,8 @@ def gen(codes:list, folder_path='./qrcodes/', transparent=False):
                  border=4)
     
     for code in codes:
-        file_path = folder_path+'/'+code+'.png'
+        file_name = Path(code+'.png')
+        file_path = path1.joinpath(file_name)
 
         try:
             os.remove(file_path)

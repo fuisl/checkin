@@ -17,6 +17,6 @@ def generate_ticket_code(quantity=10, length=6, seed='presto'):
         ticket_code = ''.join(random.choice(characters) for _ in range(length))
         tickets.append(ticket_code)
 
-    print(f'{len(tickets)} code(s) created successfully!')
+    # print(f'{len(tickets)} code(s) created successfully!')
 
     return tickets
