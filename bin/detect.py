@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 import cv2
-import pyzbar
+from pyzbar import pyzbar
 
 import pickle
 import face_recognition
@@ -19,7 +19,7 @@ class DetectBehavior(ABC):
 
 class FaceDetect(DetectBehavior):
 
-    def detect(X_frame, knn_clf=None, model_path=None, distance_threshold=0.5):
+    def detect(self, X_frame, knn_clf=None, model_path=None, distance_threshold=0.5):
         """
         Recognizes faces in given image using a trained KNN classifier
 
@@ -56,7 +56,7 @@ class FaceDetect(DetectBehavior):
         return [(pred, loc) if rec else ("unknown", loc) for pred, loc, rec in zip(knn_clf.predict(faces_encodings), X_face_locations, are_matches)]
 
 
-    def draw(frame, predictions):
+    def draw(self, frame, predictions):
         """
         Draw a red box and label detected faces.
 
