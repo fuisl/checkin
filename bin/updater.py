@@ -204,4 +204,3 @@ class TicketCode(Server):
             {"_id": {"$in": id_list}},
             {"$set": {"is_bought": True}}
         )
-            
