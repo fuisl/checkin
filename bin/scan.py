@@ -11,6 +11,7 @@ class Scanner(ABC):
 
     def __del__(self):
         self.cap.release()
+        cv2.destroyAllWindows()
     
     @abstractmethod
     def detect():
@@ -20,8 +21,13 @@ class Scanner(ABC):
     def draw():
         pass
 
+    @abstractmethod
+    def scan():
+        pass
+
+    @abstractmethod
     def update():
-        raise NotImplementedError
+        pass
 
     def connect(self, ip=None, port='4747'):
         """
@@ -72,13 +78,83 @@ class Scanner(ABC):
     
 
 class FaceScanner(FaceDetect, Scanner):
+    def __init__(self):
+        super().__init__()
+        self._knn_clf = None
+        self._model_path = None
+    
     def update():  # Update method for return data from Face Detect -> list of tuples
         pass
+    
+    def load_model(self, knn_clf=None, model_path=None):
+        self._knn_clf = knn_clf
+        self._model_path = model_path
+
+    def scan(self):
+        paused = False
+
+        switch = 14
+        while True:
+            ret, frame = self.cap.read()
+
+            if ret:
+                # Resize
+                frame_small = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+
+                switch += 1
+                # process image for every 15 frams
+                if switch % 15 == 0:
+                    faces = self.detect(frame_small,self._knn_clf, self._model_path)
+                
+                if faces:  # if any face detected
+                    if (faces[0][0] != 'unknown') & (paused == False):
+                        paused = True
+                        print(faces[0][0])
+                        # TODO: Add update() method here
+
+                frame = self.draw(frame, faces)
+
+                cv2.imshow('Face Scanner', frame)
+
+            key = cv2.waitKey(1)
+
+            if key == 27:  # exit if ESC is pressed
+                break
+            elif key == 48:  # continue if '0' is pressed
+                paused = False
+
+        self.cap.release()
+        cv2.destroyAllWindows()
     
 
 class CodeScanner(CodeDetect, Scanner):
     def update():  # Update method for return data from Code Detect -> list of string
         pass
+
+    def scan(self):
+        paused = False
+
+        while True:
+            ret, frame = self.cap.read()
+
+            if ret:
+                codes = self.detect(frame)
+                if (paused == False) & (codes != None):
+                    paused = True  # switch statement for pausing camera
+                    print(codes[0])
+                    # TODO: Add update() method here
+
+                self.draw(frame)
+                cv2.imshow("Code Scanner", frame)
+
+            key = cv2.waitKey(1)
+            if key == 27:  # exit if ESC is pressed
+                break
+            elif key == 48:  # continue if '0' is pressed
+                paused = False
+        
+        self.cap.release()
+        cv2.destroyAllWindows()
 
 arguments = sys.argv[1:]
 if __name__ == "__main__":
