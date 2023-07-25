@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 import cv2
-import pyzbar
+from pyzbar import pyzbar
 
 import pickle
 import face_recognition
