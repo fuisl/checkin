@@ -85,7 +85,7 @@ class FaceDetect(DetectBehavior):
 
 class CodeDetect(DetectBehavior):
 
-    def detect(frame):
+    def detect(self, frame):
         """
         Take a frame read from OpenCV, detect and return values detected as a list.
 
@@ -108,7 +108,7 @@ class CodeDetect(DetectBehavior):
         if codes:
             return codes
     
-    def draw(frame):
+    def draw(self, frame):
         """
         Draw a red box around detected QR/Barcode to the imported frame
         """
