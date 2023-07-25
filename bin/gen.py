@@ -1,7 +1,7 @@
 from typing import Any
 import pandas as pd
 from ticket.codegen import generate_ticket_code
-from ticket import bargen, qrgen
+from ticket import qrgen, bargen
 
 class Gen:
     def __init__(self, event_code=None) -> None:
@@ -14,12 +14,12 @@ class Gen:
         # self.df = df_input
         self.codes = []
 
-    def gen(self, n:int=1) -> list:
+    def gen(self, ticket_info: dict, n:int=1) -> list:
         """
         Initialize and return a list of n number of code.
         """
         # Generate codes and assign code to self.codes
-        self.codes = generate_ticket_code(n, seed=self.event_code)
+        self.codes = generate_ticket_code(ticket_info, n, seed=self.event_code)
 
         return self.codes
 
