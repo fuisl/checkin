@@ -7,7 +7,10 @@ import sys
 
 class Scanner(ABC):
     def __init__(self):
-        self.cap
+        self.cap = None
+
+    def __del__(self):
+        self.cap.release()
     
     @abstractmethod
     def detect():
