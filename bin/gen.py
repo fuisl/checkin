@@ -2,6 +2,7 @@ from typing import Any
 import pandas as pd
 from ticket.codegen import generate_ticket_code
 from ticket import qrgen, bargen
+
 from updater import TicketCode
 
 class Gen:
@@ -33,6 +34,7 @@ class Gen:
         tickets = ticket_database.buy_ticket(ticket_class=ticket_class, quantity=quantity)
 
         return tickets
+
     
     def encode(self, codes=None, type='qr', transparent=False, custom_path=None):
         """
