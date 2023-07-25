@@ -1,5 +1,6 @@
 from detect import FaceDetect, CodeDetect
 from abc import ABC, abstractmethod
+from updater import FaceUpdater, CodeUpdater
 
 import cv2
 import re
@@ -27,6 +28,9 @@ class Scanner(ABC):
 
     @abstractmethod
     def update():
+        """
+        Update detected code to database
+        """
         pass
 
     def connect(self, ip=None, port='4747'):
@@ -77,14 +81,12 @@ class Scanner(ABC):
         return url
     
 
-class FaceScanner(FaceDetect, Scanner):
+class FaceScanner(FaceDetect, FaceUpdater, Scanner):
     def __init__(self):
-        super().__init__()
+        super(Scanner, self).__init__()
+        super(FaceUpdater, self).__init__()
         self._knn_clf = None
         self._model_path = None
-    
-    def update():  # Update method for return data from Face Detect -> list of tuples
-        pass
     
     def load_model(self, knn_clf=None, model_path=None):
         self._knn_clf = knn_clf
@@ -111,6 +113,7 @@ class FaceScanner(FaceDetect, Scanner):
                         paused = True
                         print(faces[0][0])
                         # TODO: Add update() method here
+                        self.update(faces[0][0])
 
                 frame = self.draw(frame, faces)
 
@@ -127,9 +130,10 @@ class FaceScanner(FaceDetect, Scanner):
         cv2.destroyAllWindows()
     
 
-class CodeScanner(CodeDetect, Scanner):
-    def update():  # Update method for return data from Code Detect -> list of string
-        pass
+class CodeScanner(CodeDetect, CodeUpdater, Scanner):
+    def __init__(self):
+        super(Scanner, self).__init__()
+        super(CodeUpdater, self).__init__()
 
     def scan(self):
         paused = False
@@ -143,6 +147,7 @@ class CodeScanner(CodeDetect, Scanner):
                     paused = True  # switch statement for pausing camera
                     print(codes[0])
                     # TODO: Add update() method here
+                    self.update(codes[0])
 
                 self.draw(frame)
                 cv2.imshow("Code Scanner", frame)
