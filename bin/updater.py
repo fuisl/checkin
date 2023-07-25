@@ -82,8 +82,12 @@ class Updater(Server):
             
         ticket_info = self.__ticket_collection.aggregate(pipeline)
         return list(ticket_info)
+    
+class FaceUpdater(Updater):
+    def __init__(self):
+        super().__init__()
 
-    def face_checked(self, id: str):
+    def update(self, id: str):
         '''
         Used for checkin with face recognition. 
         :param id: user id
@@ -98,8 +102,11 @@ class Updater(Server):
                 {"$set": {"checked": True}}
             )
 
-        
-    def ticket_checked(self, ticket_code: str):
+class CodeUpdater(Updater):
+    def __init__(self):
+        super().__init__()
+
+    def update(self, ticket_code: str):
         '''
         Used for code scanned checkin.
         :param ticket_code: the literal code (encoded after scanned) of the ticket
