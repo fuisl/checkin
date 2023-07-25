@@ -11,7 +11,9 @@ def gen(codes:list, folder_path=None, transparent=False):
 
     If files exist, replace the duplicate files.
 
-    (optional) Transparent QRCode
+    :param codes: list of codes for generating
+    :param folder_path: folder_path for exporting images
+    :param transparent: set background transparent
     """
     folder_path = './qrcodes/' if folder_path == None else folder_path
     path1 = Path(folder_path)  # folder path

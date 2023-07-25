@@ -6,10 +6,19 @@ def generate_ticket_code(ticket_info: dict, quantity=10, length=6, seed='presto'
     """Generate a unique ticket code of specified length
     and return a list of ticket codes
     
-    dict ticket_info: contains all ticket classes and their corresponding required quantity
-    quantity: number of tickets need to be generated
-    length: length of ticket code (default 6)
-    seed: seed for random generator (default presto)"""
+    :param dict ticket_info: contains all ticket classes and their corresponding required quantity.
+        
+    Example ticket_info dictionary:
+    
+        {
+        'STANDARD': 5
+        'VIP': 7
+        'WAENDERLUSTE': 4
+        }
+
+    :param quantity: number of tickets need to be generated
+    :param length: length of ticket code (default 6)
+    :param seed: seed for random generator (default presto)"""
     # Initializing
 
     #raise exception if ticket_classes quantity does not match the predefined quantity
