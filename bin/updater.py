@@ -13,7 +13,7 @@ class Updater(Server):
         super().__init__()
         self.__ticket_collection = self._database['ticket']
 
-    def __get_ticket_relevant_info(self, key: str, get_by_id: bool) -> list:
+    def _get_ticket_relevant_info(self, key: str, get_by_id: bool) -> list:
         '''
         Private method. Return a list of matching documents involving both user and ticket collections.
         :param key: is either the user id or the ticket code
@@ -81,6 +81,7 @@ class Updater(Server):
             ]
             
         ticket_info = self.__ticket_collection.aggregate(pipeline)
+        
         return list(ticket_info)
     
 class FaceUpdater(Updater):
@@ -92,7 +93,7 @@ class FaceUpdater(Updater):
         Used for checkin with face recognition. 
         :param id: user id
         '''
-        ticket_status = self.__get_ticket_relevant_info(key=id, get_by_id=True)[0]['checked']
+        ticket_status = self._get_ticket_relevant_info(key=id, get_by_id=True)[0]['checked']
 
         if ticket_status:
             print('This ticket has been checked in!')
@@ -111,7 +112,7 @@ class CodeUpdater(Updater):
         Used for code scanned checkin.
         :param ticket_code: the literal code (encoded after scanned) of the ticket
         '''
-        ticket_status = self.__get_ticket_relevant_info(key=ticket_code, get_by_id=False)[0]['checked']
+        ticket_status = self._get_ticket_relevant_info(key=ticket_code, get_by_id=False)[0]['checked']
 
         #check validity
         if ticket_status:
