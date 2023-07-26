@@ -1,13 +1,7 @@
 import requests
-from Adafruit_IO import Client, Feed
-from abc import ABC, abstractmethod
+from Adafruit_IO import Client
 
-import json
-
-import time
-from datetime import datetime, timedelta
-
-class Adafruit(ABC):
+class Adafruit:
     def __init__(self, info):
         """
         Initialize object Adafruit
@@ -24,40 +18,46 @@ class Adafruit(ABC):
         key: AIO Key
         id: dashboard_id
         """
-        username = info["username"]
-        aio_key = info["key"]
+        self.username = info["username"]
+        self.aio_key = info["key"]
         # feed = info["feed"]
 
-        self.aio = Client(username, aio_key)
+        self.aio = Client(self.username, self.aio_key)
     
-    def traffic_update(self, feed, n):
+    def send(self, feed, data: any):
         """
-        Show number of people check-in per minute (people/minute)
+        Send any data to 'feed_name
 
         :param feed: feed name to display.
         :param n: people traffic at checkin.
         """
-        pass
+        self.aio.send_data(feed, data)
 
-    def face_update(self, feed, img):
+    def fetch(self, feed):
         """
-        Show picture of face_detected and checked_in frame that appears in database.
-        
-        :param feed: feed name to display.
-        :param img: encoded image that has green box drew on face.
-        """
-        pass
+        Fetch a data from a feed.
 
-    def info_update(self, feed, info):
+        :param feed: feed name to receive data.
         """
-        :param feed: feed name to display.
-        :param info: a formatted string to display ticket info.
-        """
-        pass
+        # Construct the URL for the feed data
+        url = f"https://io.adafruit.com/api/v2/{self.username}/feeds/{feed}/data"
 
-    def indicator_update(self, feed, status):
-        """
-        :param feed: feed name to display.
-        :param status: True/False indicates paused status
-        """
-        pass
+        # Set up headers with the API key
+        headers = {
+            "X-AIO-Key": self.aio_key
+        }
+
+        try:
+            # Send GET request to fetch data
+            response = requests.get(url, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                return data
+            else:
+                # print(f"Failed to fetch data. Status code: {response.status_code}")
+                return None
+
+        except requests.exceptions.RequestException as e:
+            print(f"An error occurred: {e}")
+            return None
