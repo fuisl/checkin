@@ -17,11 +17,11 @@
             <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="student_id" placeholder="Student ID" type="number">
         </div>
         <div class="mb-3">
+            <label for="gender">Gender</label>
             <select name="gender">
-                <option disabled selected>Gender</option>
-                {% for gender in genders %}
-                    <option value="{{ gender }}"> {{ gender }} </option>
-                {% endfor %}
+                <option selected value="Other">Other</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
             </select>
         </div>
         <div class="mb-3">
@@ -32,13 +32,14 @@
         </div>
         <div class="mb-3">
             <select name="ticket_class">
-                {% for type in types %}
-                    <option value="{{ type }}"> {{ type }} </option>
-                {% endfor %}
+                <option value="STANDARD">STANDARD</option>
+                <option value="VIP">VIP</option>
             </select>
         </div>
-        <input type="checkbox" name="face" value="yes">
-        <label for="face">Register face</label><br>
+        <div>
+            <label for="face">Register face</label><br> 
+            <input type="checkbox" name="face" value="yes">
+        </div>
         <button class="btn btn-primary" type="submit">Buy</button>
     </form>
 {% endblock %}

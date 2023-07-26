@@ -36,15 +36,26 @@ def after_request(response):
 def index(): 
 
     genders = ["Male", "Female", "Other"]
-    types = ["Standard", "VIP"] 
+    types = ["STANDARD", "VIP"] 
 
     # Branching on method
     if request.method == "POST": 
-        pass 
+
+        if request.form.get("face") == "yes": 
+            return redirect("/camera")
+
+        else: 
+            return redirect("/view")
+
     else: 
-        return render_template("home.html", genders=genders, types=types)
+        return render_template("home.html")
 
 @app.route("/view", methods=["GET"])
 def view(): 
 
     return render_template("view.html")
+
+@app.route("/camera", methods=["GET"])
+def camera(): 
+
+    return render_template("camera.html") 
