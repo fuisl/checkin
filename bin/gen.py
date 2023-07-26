@@ -1,59 +1,58 @@
+from typing import Any
 import pandas as pd
 from ticket.codegen import generate_ticket_code
 from ticket import qrgen, bargen
 
+from updater import TicketCode
 
 class Gen:
-    def __init__(self, df_input: pd.DataFrame, event_code) -> None:
+    def __init__(self, event_code=None) -> None:
         """
-        DataFrame must includes:
-            - id: id of individuals
-            - quantity: number of tickets each individual bought
+        Initialize Generator object.
         """
-        
-        self.df = df_input
-        
-        # Generate codes and assign code to data
-        self.codes = generate_ticket_code(self.df['quantity'].sum(), seed=event_code)
+        if event_code == None:  # set event_code if None
+            self.event_code = 'default'
 
-        # Slicing codes for individuals
-        index = self.df['quantity'].cumsum()
+        # self.df = df_input
+        self.codes = []
 
-        code_list = list()
-        start = 0  # Initializing start index
+    def gen(self, ticket_info: dict, n:int=1) -> list:
+        """
+        Initialize and return a list of n number of code.
+        """
+        # Generate codes and assign code to self.codes
+        self.codes = generate_ticket_code(ticket_info, n, seed=self.event_code)
 
-        for stop in index:
-            code_cut = self.codes[start:stop]  # List slicing and append to new list.
-            start = stop  # Update new start
-            code_list.append(code_cut)
+        return self.codes
 
-        self.df['codes'] = code_list
+    def cut(self, ticket_class, quantity=1) -> dict:
+        """
+        Get tickets info.
+        """
+        ticket_database = TicketCode()
 
-    def _exploded(self) -> pd.DataFrame:
-        exploded_df = self.df[['id', 'codes']].explode('codes', ignore_index=1)
-        return exploded_df
+        tickets = ticket_database.buy_ticket(ticket_class=ticket_class, quantity=quantity)
+
+        return tickets
+
     
-    def set(self, **kwargs):
-        """
-        set methods to change some settings
-        """
-        pass
-
-    def encode(self, type='qr', transparent=False, custom_path=None):
+    def encode(self, codes=None, type='qr', transparent=False, custom_path=None):
         """
         Encode codes into QRCode/Barcode.
 
         Parameters:
-        :type -> qr or bar.
-        :transparent -> settings for transparent background.
-        :custom_path -> path folder to export encoded files.
+        :type: qr or bar.
+        :transparent: settings for transparent background.
+        :custom_path: path folder to export encoded files.
         """
         # Set path if not provided
         if custom_path == None:
-            custom_path = './qrcodes/' if type=='qr' else './barcodes/'
+            custom_path = './qrcodes' if type=='qr' else './barcodes'
         
+        if codes == None:
+            codes = self.codes
         # Call generator
         if type == 'qr':
-            qrgen.gen(self.codes, custom_path, transparent)  # TODO: restructure qrgen for transparent option
+            qrgen.gen(codes, custom_path, transparent)
         elif type == 'bar':
-            bargen.gen(self.codes, custom_path, transparent)  # TODO: restructure bargen for transparent option
+            bargen.gen(codes, custom_path, transparent)
