@@ -36,11 +36,48 @@ def after_request(response):
 def index(): 
 
     genders = ["Male", "Female", "Other"]
-    types = ["STANDARD", "VIP"] 
+    ticket_class = ["STANDARD", "VIP"] 
 
     # Branching on method
     if request.method == "POST": 
 
+        # Check the perimeter 
+        # Check full name 
+        if not request.form.get("full_name"): 
+            return apology("Must provide full name", 400) 
+        
+        # Check student ID
+        if not request.form.get("student_id"): 
+            return apology("Must provide student ID", 400) 
+        
+        if len(request.form.get("student_id")) != 8: 
+            return apology("Unvalid student ID", 400) 
+        
+        # Check gender 
+        if not request.form.get("gender"): 
+            return apology("Must select gender")
+        
+        if request.form.get("gender") not in genders: 
+            return apology("Unvalid gender", 400)
+        
+        # Check email 
+        if not request.form.get("email"): 
+            return apology("Must provide email")
+        
+        
+        
+        # Check ticket class 
+        if not request.form.get("ticket_class"): 
+            return apology("Must select ticket class")
+        
+        if request.form.get("ticket_class") not in ticket_class: 
+            return apology("Unvalid ticket class", 400)
+        
+        # Check ticket num 
+        if not request.form.get("ticket_num"):
+            return apology("Must provide the number of tickets", 400)
+
+        # Redirect 
         if request.form.get("face") == "yes": 
             return redirect("/camera")
 
