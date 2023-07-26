@@ -81,7 +81,7 @@ class Updater(Server):
             ]
             
         ticket_info = self.__ticket_collection.aggregate(pipeline)
-        print(list(ticket_info))
+        
         return list(ticket_info)
     
 class FaceUpdater(Updater):
@@ -112,7 +112,7 @@ class CodeUpdater(Updater):
         Used for code scanned checkin.
         :param ticket_code: the literal code (encoded after scanned) of the ticket
         '''
-        ticket_status = self.__get_ticket_relevant_info(key=ticket_code, get_by_id=False)[0]['checked']
+        ticket_status = self._get_ticket_relevant_info(key=ticket_code, get_by_id=False)[0]['checked']
 
         #check validity
         if ticket_status:
