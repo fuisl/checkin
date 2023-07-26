@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block title %}
+
+{% endblock %}
+
+{% block link %}
+    <li class="nav-item"><a class="nav-link" href="/view">View tickets</a></li>
+{% endblock %}
+
+{% block content %}
+    <form action="/buy" method="post">
+        <div class="mb-3">
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="full_name" placeholder="Full name" type="text">
+        </div>
+        <div class="mb-3">
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="student_id" placeholder="Student ID" type="number">
+        </div>
+        <div class="mb-3">
+            <select name="gender">
+                <option disabled selected>Gender</option>
+                {% for gender in genders %}
+                    <option value="{{ gender }}"> {{ gender }} </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="email" placeholder="VGU email" type="text">
+        </div>
+        <div class="mb-3">
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="ticket_num" placeholder="Number of tickets" type="number">
+        </div>
+        <div class="mb-3">
+            <select name="ticket_class">
+                {% for type in types %}
+                    <option value="{{ type }}"> {{ type }} </option>
+                {% endfor %}
+            </select>
+        </div>
+        <input type="checkbox" name="face" value="yes">
+        <label for="face">Register face</label><br>
+        <button class="btn btn-primary" type="submit">Buy</button>
+    </form>
+{% endblock %}
