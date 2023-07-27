@@ -20,17 +20,6 @@ class Gen:
         codes = generate_ticket_code(ticket_info, n, seed=self.event_code)
 
         TicketCode().create_tickets(codes)
-
-    def cut(self, ticket_class, quantity=1) -> dict:
-        """
-        Get tickets info.
-        """
-        ticket_database = TicketCode()
-
-        tickets = ticket_database.buy_ticket(ticket_class=ticket_class, quantity=quantity)
-
-        return tickets
-
     
     def encode(self, codes=None, type='qr', transparent=False, custom_path=None):
         """
