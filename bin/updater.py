@@ -120,7 +120,7 @@ class CodeUpdater(Updater):
             print('This ticket has been checked in!')
         else:
             increase_checkin_by_one()
-            self.__ticket_collection.update_one(
+            self._ticket_collection.update_one(
                 {"_id": ticket_code},
                 {"$set": {"checked": True}}
             )
