@@ -75,12 +75,15 @@ def index():
             return apology("Unvalid ticket class", 400)
         
         # Check ticket num 
-        if not request.form.get("ticket_num"):
-            return apology("Must provide the number of tickets", 400)
+        # if not request.form.get("ticket_num"):
+        #     return apology("Must provide the number of tickets", 400)
+
+        student_id = request.form.get("student_id") 
 
         # Redirect 
         if request.form.get("face") == "yes": 
-            return redirect("/camera")
+
+            return redirect(f"/camera?student_id=<{student_id}>")
 
         else: 
             return redirect("/view")
@@ -93,7 +96,7 @@ def view():
 
     return render_template("view.html")
 
-@app.route("/camera", methods=["GET"])
+@app.route("/camera/?student_id=<student_id>", methods=["GET"])
 def camera(): 
 
     return render_template("camera.html") 

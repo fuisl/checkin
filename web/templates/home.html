@@ -32,7 +32,7 @@
             <input type="checkbox" name="face" id="face" value="yes">
         </div>
         <div class="mb-3">
-            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="ticket_num" id="ticket_num" placeholder="Number of tickets" type="number" value="1">
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="ticket_num" id="ticket_num" placeholder="Number of tickets" type="number" value="1" required>
             <script>
                 document.getElementById('face').onchange = function() {
                     document.getElementById('ticket_num').disabled = this.checked;
