@@ -3,7 +3,7 @@ import pymongo
 class Server(object):
     def __init__(self):
         self.__server = pymongo.MongoClient("mongodb://localhost:27017")
-        self.web_server = self.__server["web_db"]
+        self._web_server = self.__server["web_db"]
 
 
 class User(Server):
@@ -11,7 +11,7 @@ class User(Server):
 
     def __init__(self):
         super().__init__()
-        self.__collection = self.web_server['user']
+        self.__collection = self._web_server['user']
         
 
     def get_user(self, id: str) -> dict:
@@ -60,7 +60,7 @@ class UserFace(Server):
     '''Class for working with the user_face collection'''
     def __init__(self):
         super().__init__()
-        self.__collection = self.web_server['user_face']
+        self.__collection = self._web_server['user_face']
 
     def get_face(self, id: str) -> dict:
         '''
@@ -100,7 +100,7 @@ class UserPassword(Server):
 
     def __init__(self):
         super().__init__()
-        self.__collection = self.web_server['user_password']
+        self.__collection = self._web_server['user_password']
 
     def get_password(self, id: str) -> str:
         '''
@@ -137,7 +137,7 @@ class Ticket(Server):
 
     def __init__(self):
         super().__init__()
-        self.__collection = self.web_server['ticket']
+        self.__collection = self._web_server['ticket']
 
     def get_ticket_by_id(self, id: str):
         '''Return a mongoDb cursor containing all matching tickets by user_id'''
@@ -178,3 +178,44 @@ class Ticket(Server):
     def add_ticket(self, user_id: str, quantity: int, ticket_class: str) -> None:
         '''Update the collection with a list of bought tickets from a user'''
         pass
+
+class TicketData(Server):
+    def __init__(self):
+        super().__init__()
+        self.__ticket_data_collection = self._web_server['ticket_data']
+
+    def buy_ticket(self, ticket_class: str, quantity: int):
+        '''
+        Get desired number of tickets and return their info
+        '''
+
+        all_available_tickets = self.__ticket_data_collection.find(
+            {
+                "class": ticket_class,
+                "is_bought": False
+        })
+
+        #check if there are enough tickets
+        if all_available_tickets.count() < quantity:
+            print("Not enough tickets!")
+            return {}
+        else:
+            tickets = all_available_tickets.limit(quantity)
+
+            self.__update_ticket_purchase_status(tickets)
+
+        return tickets
+
+    def __update_ticket_purchase_status(self, tickets):
+        '''
+        Change chosen tickets is_bought status to True
+        '''
+
+        id_list = []
+        for ticket in tickets:
+            id_list.append(ticket['_id'])
+
+        self.__ticket_data_collection.update_many(
+            {"_id": {"$in": id_list}},
+            {"$set": {"is_bought": True}}
+        )

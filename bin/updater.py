@@ -169,41 +169,5 @@ class TicketCode(Server):
         super().__init__()
         self.__ticket_data_collection = self._database['ticket_data']
 
-    def buy_ticket(self, ticket_class: str, quantity: int):
-        '''
-        Get desired number of tickets and return their info
-        '''
-
-        all_available_tickets = self.__ticket_data_collection.find(
-            {
-                "class": ticket_class,
-                "is_bought": False
-        })
-
-        #check if there are enough tickets
-        if all_available_tickets.count() < quantity:
-            print("Not enough tickets!")
-            return {}
-        else:
-            tickets = all_available_tickets.limit(quantity)
-
-            self.__update_ticket_purchase_status(tickets)
-
-        return tickets
-
-    def __update_ticket_purchase_status(self, tickets):
-        '''
-        Change chosen tickets is_bought status to True
-        '''
-
-        id_list = []
-        for ticket in tickets:
-            id_list.append(ticket['_id'])
-
-        self.__ticket_data_collection.update_many(
-            {"_id": {"$in": id_list}},
-            {"$set": {"is_bought": True}}
-        )
-
     def create_tickets(self, data: list):
         self.__ticket_data_collection.insert_many(data)
