@@ -204,3 +204,6 @@ class TicketCode(Server):
             {"_id": {"$in": id_list}},
             {"$set": {"is_bought": True}}
         )
+
+    def create_tickets(self, data: list):
+        self.__ticket_data_collection.insert_many(data)
