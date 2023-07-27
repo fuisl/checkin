@@ -21,3 +21,9 @@ nav .navbar-brand .green
 {
     color: #2e944b;
 }
+nav .nav-item 
+{
+    list-style-type: none; 
+    padding: 0; 
+    margin: 0; 
+}

@@ -62,9 +62,10 @@ def index():
         
         # Check email 
         if not request.form.get("email"): 
-            return apology("Must provide email")
+            return apology("Must provide email", 400)
         
-        
+        if not ("@" in request.form.get("email") and (request.form.get("email").endswith((".com", ".vn")))):
+            return apology("Unvalid email", 400)
         
         # Check ticket class 
         if not request.form.get("ticket_class"): 

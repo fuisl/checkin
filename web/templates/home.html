@@ -9,24 +9,7 @@
 {% endblock %}
 
 {% block content %}
-
-    <script>
-        function EnableDisable(face) {
-                //Reference the Button.
-                var ticket_num = document.getElementById("ticket_num");
-        
-                //Verify the TextBox value.
-                if (face.value.trim() == "yes") {
-                    //Enable the TextBox when TextBox has value.
-                    ticket_num.disabled = true;
-                } else {
-                    //Disable the TextBox when TextBox is empty.
-                    ticket_num.disabled = false;
-                }
-            };
-    </script>
-
-    <form action="/buy" method="post">
+    <form method="post">
         <div class="mb-3">
             <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="full_name" placeholder="Full name" type="text">
         </div>
@@ -44,8 +27,17 @@
         <div class="mb-3">
             <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="email" placeholder="VGU email" type="text">
         </div>
+        <div>
+            <label for="face">Register face</label><br> 
+            <input type="checkbox" name="face" id="face" value="yes">
+        </div>
         <div class="mb-3">
-            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="ticket_num" id="ticket_num" placeholder="Number of tickets" type="number" value="1" disabled>
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="ticket_num" id="ticket_num" placeholder="Number of tickets" type="number" value="1">
+            <script>
+                document.getElementById('face').onchange = function() {
+                    document.getElementById('ticket_num').disabled = this.checked;
+                };
+            </script>
         </div>
         <div class="mb-3">
             <label for="ticket_class">Ticket class</label>
@@ -54,10 +46,6 @@
                 <option value="STANDARD">STANDARD</option>
                 <option value="VIP">VIP</option>
             </select>
-        </div>
-        <div>
-            <label for="face">Register face</label><br> 
-            <input type="checkbox" name="face" id="face" value="yes">
         </div>
         <button class="btn btn-primary" type="submit">Buy</button>
     </form>
