@@ -1,5 +1,7 @@
 import requests
 from Adafruit_IO import Client
+import cv2
+import base64
 
 class Adafruit:
     def __init__(self, info):
@@ -16,7 +18,6 @@ class Adafruit:
 
         username: Adafruit username
         key: AIO Key
-        id: dashboard_id
         """
         self.username = info["username"]
         self.aio_key = info["key"]
@@ -61,3 +62,20 @@ class Adafruit:
         except requests.exceptions.RequestException as e:
             print(f"An error occurred: {e}")
             return None
+    
+    TARGET_SIZE_BYTES = 100 * 1024
+    def send_img(self, feed, frame):
+        # Resize the frame while keeping the aspect ratio
+        target_width = 320  # You can adjust this value to control the size
+        aspect_ratio = frame.shape[1] / frame.shape[0]
+        target_height = int(target_width / aspect_ratio)
+        resized_frame = cv2.resize(frame, (target_width, target_height))
+        
+        # Convert the frame to JPEG format as bytes
+        _, buffer = cv2.imencode(".jpg", resized_frame)
+        jpg_as_bytes = buffer.tobytes()
+
+        # Encode the bytes to base64 and convert to string
+        jpg_as_text = base64.b64encode(jpg_as_bytes).decode("utf-8")
+
+        self.aio.send_data(feed, jpg_as_text)

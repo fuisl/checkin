@@ -1,6 +1,7 @@
 from detect import FaceDetect, CodeDetect
 from abc import ABC, abstractmethod
 from updater import FaceUpdater, CodeUpdater
+from adafruit import Adafruit
 
 import cv2
 import re
@@ -95,6 +96,19 @@ class FaceScanner(FaceDetect, FaceUpdater, Scanner):
     def scan(self):
         paused = False
 
+        info = {"username":"fuisl",
+                "key":"aio_Zpqj39l0FDq745LDnw1P1zuKxXXE"}
+        """
+        Feed names and its input data:
+
+        traffic: people/minute: float -> 4.52 p/m
+        info: detected info: string -> "10422021 - Tran Hai Duong - 4YC8UA"
+        face: frame with face detected: OpenCV frame
+        paused: pausing status: bool -> True/False
+        """
+        ada = Adafruit(info)
+
+        switch2 = 59
         switch = 14
         while True:
             ret, frame = self.cap.read()
@@ -108,14 +122,22 @@ class FaceScanner(FaceDetect, FaceUpdater, Scanner):
                 if switch % 15 == 0:
                     faces = self.detect(frame_small,self._knn_clf, self._model_path)
                 
+                switch2 += 1
+                if switch2 % 60 == 0:
+                    if ada.fetch('paused')[0]['value'] == '0':
+                        paused = False
+
                 if faces:  # if any face detected
+                    frame = self.draw(frame, faces)
+
                     if (faces[0][0] != 'unknown') & (paused == False):
                         paused = True
+                        ada.send('paused', '1')
                         print(faces[0][0])
                         # TODO: Add update() method here
-                        self.update(faces[0][0])
-
-                frame = self.draw(frame, faces)
+                        # self.update(faces[0][0])
+                        
+                        ada.send_img('face', frame)
 
                 cv2.imshow('Face Scanner', frame)
 
