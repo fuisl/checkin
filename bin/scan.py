@@ -94,8 +94,6 @@ class FaceScanner(FaceDetect, FaceUpdater, Scanner):
         self._model_path = model_path
 
     def scan(self):
-        paused = False
-
         info = {"username":"fuisl",
                 "key":"aio_Zpqj39l0FDq745LDnw1P1zuKxXXE"}
         """
@@ -107,9 +105,9 @@ class FaceScanner(FaceDetect, FaceUpdater, Scanner):
         paused: pausing status: bool -> True/False
         """
         ada = Adafruit(info)
-
-        switch2 = 59
-        switch = 14
+        ada.connect()
+        
+        switch = 14  # switch statement for processing image
         while True:
             ret, frame = self.cap.read()
 
@@ -118,26 +116,23 @@ class FaceScanner(FaceDetect, FaceUpdater, Scanner):
                 frame_small = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
 
                 switch += 1
-                # process image for every 15 frams
+                # process image for every 15 frames
                 if switch % 15 == 0:
                     faces = self.detect(frame_small,self._knn_clf, self._model_path)
                 
-                switch2 += 1
-                if switch2 % 60 == 0:
-                    if ada.fetch('paused')[0]['value'] == '0':
-                        paused = False
+                paused = ada.paused
 
                 if faces:  # if any face detected
                     frame = self.draw(frame, faces)
 
                     if (faces[0][0] != 'unknown') & (paused == False):
-                        paused = True
+                        ada.paused = True
                         ada.send('paused', '1')
+                        ada.send_img('face', frame)
+
                         print(faces[0][0])
                         # TODO: Add update() method here
                         # self.update(faces[0][0])
-                        
-                        ada.send_img('face', frame)
 
                 cv2.imshow('Face Scanner', frame)
 
@@ -160,18 +155,32 @@ class CodeScanner(CodeDetect, CodeUpdater, Scanner):
     def scan(self):
         paused = False
 
+        info = {"username":"fuisl",
+                "key":"aio_Zpqj39l0FDq745LDnw1P1zuKxXXE"}
+        ada = Adafruit(info)
+        ada.connect()
+
         while True:
             ret, frame = self.cap.read()
 
             if ret:
+
+                paused = ada.paused
+
                 codes = self.detect(frame)
+                self.draw(frame)
+
                 if (paused == False) & (codes != None):
-                    paused = True  # switch statement for pausing camera
+                    ada.paused = True
+                    ada.send('paused', '1')
                     print(codes[0])
                     # TODO: Add update() method here
-                    self.update(codes[0])
+                    # self.update(codes[0])
 
-                self.draw(frame)
+                    # send image to adafruit
+                    unknown = cv2.imread("./unknown.png")
+                    ada.send_img('face', unknown)
+
                 cv2.imshow("Code Scanner", frame)
 
             key = cv2.waitKey(1)

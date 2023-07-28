@@ -1,30 +1,49 @@
-import requests
-from Adafruit_IO import Client
+from Adafruit_IO import MQTTClient
 import cv2
 import base64
 
 class Adafruit:
-    def __init__(self, info):
-        """
-        Initialize object Adafruit
-
-        :param info: dictionary contains info of user and dashboard.
-        Example:
-        
-        dict = {
-            "username":"fuisl",
-            "key"="..."
-        }
-
-        username: Adafruit username
-        key: AIO Key
-        """
+    def __init__(self, info:dict) -> None:
         self.username = info["username"]
         self.aio_key = info["key"]
-        # feed = info["feed"]
 
-        self.aio = Client(self.username, self.aio_key)
-    
+        self.aio = MQTTClient(self.username, self.aio_key)
+
+        self.paused = False
+
+    def __connected(self, client):
+        print("Connected to Adafruit IO!  Listening for {0} changes...".format(self.username))
+        # Subscribe to changes on a feed named DemoFeed.
+        client.subscribe('paused')
+        client.subscribe('continue')
+
+    def __subscribe(self, client, userdata, mid, granted_qos):
+        print("Subscribed!")
+
+    def __disconnected(self, client):
+        print("Disconnected from Adafruit IO!")
+
+    def __message(self, client, feed_id, payload):
+        print("Feed {0} received new value: {1}".format(feed_id, payload))
+        if feed_id == "paused":
+            self.paused = True if payload == "1" else False
+
+        if feed_id == "continue":
+            self.paused = False
+            self.send("paused", "0")
+
+    def connect(self):
+        self.aio.on_connect = self.__connected
+        self.aio.on_disconnect = self.__disconnected
+        self.aio.on_message = self.__message
+        self.aio.on_subscribe = self.__subscribe
+
+        self.aio.connect()
+        self.aio.loop_background()
+
+        # Reset paused to False:
+        self.send("paused", "0")
+
     def send(self, feed, data: any):
         """
         Send any data to 'feed_name
@@ -32,39 +51,15 @@ class Adafruit:
         :param feed: feed name to display.
         :param n: people traffic at checkin.
         """
-        self.aio.send_data(feed, data)
+        self.aio.publish(feed, data)
 
-    def fetch(self, feed):
-        """
-        Fetch a data from a feed.
-
-        :param feed: feed name to receive data.
-        """
-        # Construct the URL for the feed data
-        url = f"https://io.adafruit.com/api/v2/{self.username}/feeds/{feed}/data"
-
-        # Set up headers with the API key
-        headers = {
-            "X-AIO-Key": self.aio_key
-        }
-
-        try:
-            # Send GET request to fetch data
-            response = requests.get(url, headers=headers)
-            
-            if response.status_code == 200:
-                data = response.json()
-                return data
-            else:
-                # print(f"Failed to fetch data. Status code: {response.status_code}")
-                return None
-
-        except requests.exceptions.RequestException as e:
-            print(f"An error occurred: {e}")
-            return None
-    
-    TARGET_SIZE_BYTES = 100 * 1024
     def send_img(self, feed, frame):
+        """
+        Send image to 'feed_name
+
+        :param feed: feed name to display.
+        :param frame: frame to send.
+        """
         # Resize the frame while keeping the aspect ratio
         target_width = 320  # You can adjust this value to control the size
         aspect_ratio = frame.shape[1] / frame.shape[0]
@@ -78,4 +73,4 @@ class Adafruit:
         # Encode the bytes to base64 and convert to string
         jpg_as_text = base64.b64encode(jpg_as_bytes).decode("utf-8")
 
-        self.aio.send_data(feed, jpg_as_text)
+        self.aio.publish(feed, jpg_as_text)
