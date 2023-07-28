@@ -175,16 +175,22 @@ class Ticket(Server):
         else:
             return result
 
-    def add_ticket(self, user_id: str, quantity: int, ticket_class: str) -> None:
+    def add_ticket(self, ticket_id: str, user_id: str, ticket_class: str) -> None:
         '''Update the collection with a list of bought tickets from a user'''
-        pass
+        ticket_collection = self.__collection
+        ticket_collection.insert_one({
+            "_id": ticket_id,
+            "user_id": user_id,
+            "class": ticket_class,
+            "checked": False
+        })
 
 class TicketData(Server):
     def __init__(self):
         super().__init__()
         self.__ticket_data_collection = self._web_server['ticket_data']
 
-    def buy_ticket(self, ticket_class: str, quantity: int):
+    def buy_ticket(self, ticket_class: str, quantity: int) -> list:
         '''
         Get desired number of tickets and return their info
         '''
@@ -200,7 +206,7 @@ class TicketData(Server):
             print("Not enough tickets!")
             return {}
         else:
-            tickets = all_available_tickets.limit(quantity)
+            tickets = list(all_available_tickets.limit(quantity))
 
             self.__update_ticket_purchase_status(tickets)
 

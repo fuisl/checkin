@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block content %} 
-    <img src="{{ url_for('video_feed') }}" />
+    <img src="{{ url_for('video_feed', id=student_id) }}" />
     <p> 
         The system is storing {{ picture_num }} pictures. 
     </p>
