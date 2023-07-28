@@ -106,8 +106,11 @@ def index():
             return apology("Unvalid ticket class", 400)
         
         # Check ticket num 
-        # if not request.form.get("ticket_num"):
-        #     return apology("Must provide the number of tickets", 400)
+        if request.form.get("face") == "yes":
+            ticket_num = 1
+        else: 
+            if not request.form.get("ticket_num"):
+                return apology("Must provide the number of tickets", 400)
 
         #gather info
         user_info = {
@@ -140,7 +143,7 @@ def index():
         # Redirect 
         if request.form.get("face") == "yes": 
 
-            return redirect(f"/camera/{student_id}")
+            return redirect(f"/camera/<{student_id}>")
 
         else: 
             return redirect("/view")
