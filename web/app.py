@@ -64,7 +64,6 @@ def index():
 
     # Branching on method
     if request.method == "POST": 
-        print(request.args)
         name = request.form.get("full_name")
         student_id = request.form.get("student_id")
         gender = request.form.get("gender")
