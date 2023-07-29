@@ -33,7 +33,8 @@ def webcam(camera, id):
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
         
-        image_path_list.append(image_path)
+        if image_path != "":
+            image_path_list.append(image_path)
         
         if camera.counter >= 40:
             del camera
@@ -138,7 +139,7 @@ def index():
         # Redirect 
         if request.form.get("face") == "yes": 
 
-            return redirect(f"/camera/<{student_id}>")
+            return redirect(f"/camera/{student_id}")
 
         else: 
             return redirect("/view")
