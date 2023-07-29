@@ -3,7 +3,7 @@ from helper import apology
 from flask_session import Session 
 from camera import WebCam
 import server
-
+from ticket import render_tickets
 import os
 
 #declare all collections
@@ -147,10 +147,14 @@ def index():
     else: 
         return render_template("home.html")
 
-@app.route("/view", methods=["GET"])
+@app.route("/view", methods=["GET", "POST"])
 def view(): 
-
-    return render_template("view.html")
+    if request.method == 'POST':
+        user_id = request.form['student_id']
+        images_for_web = [f'data:image/png;base64,{image}' for image in render_tickets(user_id)]
+        return render_template("view.html", image_list=images_for_web)
+    
+    return render_template("view.html")    
 
 @app.route("/camera/<student_id>", methods=["GET"])
 def camera(student_id): 
