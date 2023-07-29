@@ -30,7 +30,7 @@ def gen(codes:list, folder_path=None, transparent=False):
                  border=4)
     
     for code in codes:
-        file_name = Path(code+'.png')
+        file_name = Path(code['_id']+'.png')
         file_path = path1.joinpath(file_name)
 
         try:
