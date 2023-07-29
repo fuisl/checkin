@@ -1,4 +1,5 @@
 import pymongo
+from time_tracking import increase_checkin_by_one
 
 class Server(object):
     def __init__(self):
@@ -11,7 +12,7 @@ class Updater(Server):
     '''
     def __init__(self):
         super().__init__()
-        self.__ticket_collection = self._database['ticket']
+        self._ticket_collection = self._database['ticket']
 
     def _get_ticket_relevant_info(self, key: str, get_by_id: bool) -> list:
         '''
@@ -80,8 +81,7 @@ class Updater(Server):
                 }
             ]
             
-        ticket_info = self.__ticket_collection.aggregate(pipeline)
-        
+        ticket_info = self._ticket_collection.aggregate(pipeline)
         return list(ticket_info)
     
 class FaceUpdater(Updater):
@@ -98,7 +98,8 @@ class FaceUpdater(Updater):
         if ticket_status:
             print('This ticket has been checked in!')
         else:
-            self.__ticket_collection.update_one(
+            increase_checkin_by_one()
+            self._ticket_collection.update_one(
                 {"user_id": id},
                 {"$set": {"checked": True}}
             )
@@ -118,7 +119,8 @@ class CodeUpdater(Updater):
         if ticket_status:
             print('This ticket has been checked in!')
         else:
-            self.__ticket_collection.update_one(
+            increase_checkin_by_one()
+            self._ticket_collection.update_one(
                 {"_id": ticket_code},
                 {"$set": {"checked": True}}
             )
