@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block title %}
+
+{% endblock %}
+
+{% block link %}
+    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+{% endblock %}
+
+{% block content %}
+    <div class="mb-3">
+        <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="student_id" placeholder="Student ID" type="number">
+    </div>    
+    <button class="btn btn-primary" id="view" type="submit" onclick="show()">View</button>
+    <div>
+        <table class="table table-striped" id="table" style="display: none">
+            <thead>
+                <tr>
+                    <th class="text-start">ID</th>
+                    <th class="text-end">Class</th>
+                    <th class="text-end">Quantity</th>
+                </tr>
+            </thead>
+    
+            <tfoot>
+            </tfoot>
+        </table>
+        <script>
+            function show() {
+                document.getElementById("table").style.display = "table";
+            }; 
+        </script>
+    </div>
+{% endblock %}

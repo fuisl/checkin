@@ -37,25 +37,18 @@ def generate_ticket_code(ticket_info: dict, quantity=10, length=6, seed='presto'
     random.seed(seed)
     characters = string.ascii_uppercase + string.digits
     
+    #generate and combine ticket data
     for i in range(quantity):
         ticket_code = ''.join(random.choice(characters) for _ in range(length))
-        tickets.append(ticket_code)
-
-    # print(f'{len(tickets)} code(s) created successfully!')
-
-    result = list(zip(tickets, ticket_classes))
-
-    #create data, this could be separated into another function 
-    header = ['code', 'class']
-
-    with open('code.csv', 'w') as f:
-        writer = csv.writer(f)
         
-        writer.writerow(header)
+        ticket_data = {
+            "class": ticket_classes[i],
+            "_id": ticket_code,
+            "is_bought": False
+        }
 
-        for i in result:
-            writer.writerow(i)
-    
-    #hàm vẫn trả về tickets như thường, nhưng mà sau này sẽ xài file csv nên mày có thể dựa theo đó chỉnh lại output của hàm này. Có thể là không trả gì hết, hàm gen bên Gen sẽ tự extract csv và return code
+        tickets.append(ticket_data)
+    if len(tickets) == quantity:
+        print(f'{len(tickets)} code(s) created successfully!')
 
     return tickets

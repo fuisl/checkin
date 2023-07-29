@@ -1,0 +1,18 @@
+{% extends "layout.html" %} 
+
+{% block title %} 
+    Camera 
+{% endblock %}
+
+{% block link %} 
+    <li class="nav-item"><a class="nav-link" href="/view">View tickets</a></li>
+    <li class="nav-item"><a class="nav-link" href="/home">Home</a></li> 
+{% endblock %}
+
+{% block content %} 
+    <img src="{{ url_for('video_feed', id=student_id) }}" />
+    <p> 
+        The system is storing {{ picture_num }} pictures. 
+    </p>
+    <button class="btn btn-primary" type="submit">Activate Camera</button>
+{% endblock %}
