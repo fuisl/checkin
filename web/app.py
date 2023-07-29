@@ -1,15 +1,10 @@
-from flask import Flask, flash, redirect, render_template, request, session, url_for, Response
-from helper import login_required, apology
-from logging import FileHandler, WARNING 
+from flask import Flask, flash, redirect, render_template, request, url_for, Response
+from helper import apology 
 from flask_session import Session 
-from werkzeug.security import check_password_hash, generate_password_hash
 from camera import WebCam
 import server
 
 import os
-import flask 
-import csv 
-import pandas as pd 
 
 #declare all collections
 face_collection = server.UserFace()
@@ -64,52 +59,53 @@ def index():
 
     # Branching on method
     if request.method == "POST": 
-        name = request.form.get("full_name")
-        student_id = request.form.get("student_id")
-        gender = request.form.get("gender")
-        email = request.form.get("email")
-        ticket_class = request.form.get("ticket_class")
-        ticket_num = int(request.form.get("ticket_num"))
 
         # Check the perimeter 
         # Check full name 
-        if not name: 
+        if not request.form.get("full_name"): 
             return apology("Must provide full name", 400) 
         
         # Check student ID
-        if not student_id: 
+        if not request.form.get("student_id"): 
             return apology("Must provide student ID", 400) 
         
-        if len(student_id) != 8: 
+        if len(request.form.get("student_id")) != 8: 
             return apology("Invalid student ID", 400) 
         
         # Check gender 
-        if not gender: 
+        if not request.form.get("gender"): 
             return apology("Must select gender")
         
-        if gender not in genders: 
+        if request.form.get("gender") not in genders: 
             return apology("Unvalid gender", 400)
         
         # Check email 
-        if not email: 
+        if not request.form.get("email"): 
             return apology("Must provide email", 400)
         
-        if not ("@" in email and (email.endswith((".com", ".vn")))):
+        if not ("@" in request.form.get("email") and (request.form.get("email").endswith((".com", ".vn")))):
             return apology("Unvalid email", 400)
         
         # Check ticket class 
-        if not ticket_class: 
+        if not request.form.get("ticket_class"): 
             return apology("Must select ticket class")
         
-        if ticket_class not in ticket_classes_list: 
+        if request.form.get("ticket_class") not in ticket_classes_list: 
             return apology("Unvalid ticket class", 400)
         
         # Check ticket num 
         if request.form.get("face") == "yes":
             ticket_num = 1
         else: 
-            if not request.form.get("ticket_num"):
+            if (not request.form.get("ticket_num")):
                 return apology("Must provide the number of tickets", 400)
+            ticket_num = int(request.form.get("ticket_num"))
+            
+        name = request.form.get("full_name")
+        student_id = request.form.get("student_id")
+        gender = request.form.get("gender")
+        email = request.form.get("email")
+        ticket_class = request.form.get("ticket_class")
 
         #gather info
         user_info = {
