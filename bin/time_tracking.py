@@ -1,4 +1,5 @@
 import time
+from adafruit import Adafruit
 
 time_intervals_list = []
 
@@ -17,7 +18,7 @@ def calculate_changes():
 
     result = sum(time_intervals_list)
 
-    print(f'List: {time_intervals_list}')
+    # print(f'List: {time_intervals_list}')
 
     return result
 
@@ -27,7 +28,14 @@ def increase_checkin_by_one():
     rate_of_change += 1
 
 def execute():
+    ada = Adafruit({"username":"fuisl", 
+                    "key":"aio_tTnu32dUJzFAb2CAujEyANAQVnKl"})  # create adafruit client
+    ada.connect()  # connect to adafruit server
+
     while True:
         time.sleep(5)
         calculate_changes()
+        data=time_intervals_list[-1]
+        # print(f'Traffic at checkin: {data}')
 
+        ada.send('traffic', data)
