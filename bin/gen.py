@@ -12,14 +12,21 @@ class Gen:
         if event_code == None:  # set event_code if None
             self.event_code = 'default'
 
-    def gen(self, ticket_info: dict, n:int=1) -> list:
+        self.codes = []  # list of codes
+
+    def gen(self, ticket_info: dict) -> list:
         """
         Initialize and return a list of n number of code.
         """
+        # Get number of tickets
+        n = sum(ticket_info.values())
+
         # Generate codes and assign code to self.codes
         codes = generate_ticket_code(ticket_info, n, seed=self.event_code)
 
-        TicketCode().create_tickets(codes)
+        self.codes = codes
+
+        TicketCode().create_tickets(codes) # Create tickets in database
     
     def encode(self, codes=None, type='qr', transparent=False, custom_path=None):
         """
