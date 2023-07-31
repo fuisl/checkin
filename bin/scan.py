@@ -2,6 +2,8 @@ from detect import FaceDetect, CodeDetect
 from abc import ABC, abstractmethod
 from updater import FaceUpdater, CodeUpdater
 from adafruit import Adafruit
+import time_tracking
+import threading
 
 import cv2
 import re
@@ -109,7 +111,11 @@ class FaceScanner(FaceDetect, FaceUpdater, Scanner):
         """
         ada = Adafruit(self._ada_info)
         ada.connect()
-        
+
+        # start time tracking thread to show traffic
+        thread = threading.Thread(target=time_tracking.execute) 
+        thread.start()
+
         switch = 14  # switch statement for processing image
         while True:
             ret, frame = self.cap.read()
@@ -129,6 +135,12 @@ class FaceScanner(FaceDetect, FaceUpdater, Scanner):
                     frame = self.draw(frame, faces)
 
                     if (faces[0][0] != 'unknown') & (paused == False):
+                        time_tracking.increase_checkin_by_one()
+                        
+                        info = self.get_info(faces[0][0])
+                        info_string = info['customer_id'] + ' - ' + info['name'] + ' - ' + info['class']
+                        ada.send('info', info_string)
+
                         ada.paused = True
                         ada.send('paused', '1')
                         ada.send_img('face', frame)
