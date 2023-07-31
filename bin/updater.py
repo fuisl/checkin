@@ -93,7 +93,9 @@ class FaceUpdater(Updater):
         Used for checkin with face recognition. 
         :param id: user id
         '''
-        ticket_status = self._get_ticket_relevant_info(key=id, get_by_id=True)[0]['checked']
+        get_ticket = self._get_ticket_relevant_info(key=id, get_by_id=True)
+        if get_ticket:
+            ticket_status = get_ticket[0]['checked']
 
         if ticket_status:
             print('This ticket has been checked in!')
@@ -113,7 +115,12 @@ class CodeUpdater(Updater):
         Used for code scanned checkin.
         :param ticket_code: the literal code (encoded after scanned) of the ticket
         '''
-        ticket_status = self._get_ticket_relevant_info(key=ticket_code, get_by_id=False)[0]['checked']
+        get_ticket = self._get_ticket_relevant_info(key=ticket_code, get_by_id=False)
+        if get_ticket:
+            ticket_status = get_ticket[0]['checked']
+        else:
+            print('Invalid ticket!')
+            return
 
         #check validity
         if ticket_status:

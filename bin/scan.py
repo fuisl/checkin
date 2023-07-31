@@ -10,6 +10,7 @@ import sys
 class Scanner(ABC):
     def __init__(self):
         self.cap = None
+        self._ada_info = {} # adafruit info
 
     def __del__(self):
         self.cap.release()
@@ -62,7 +63,11 @@ class Scanner(ABC):
                     
         else:
             raise ValueError("Invalid IP Address")
-
+    
+    def set_ada_info(self, info:dict = {"username":"fuisl",
+                                        "key":"aio_tTnu32dUJzFAb2CAujEyANAQVnKl"}):
+        self._ada_info = info
+    
     def _is_valid_ip(self, address):
         """
         Check if a string is valid IP Address
@@ -88,14 +93,12 @@ class FaceScanner(FaceDetect, FaceUpdater, Scanner):
         super(FaceUpdater, self).__init__()
         self._knn_clf = None
         self._model_path = None
-    
+
     def load_model(self, knn_clf=None, model_path=None):
         self._knn_clf = knn_clf
         self._model_path = model_path
 
     def scan(self):
-        info = {"username":"fuisl",
-                "key":"aio_Zpqj39l0FDq745LDnw1P1zuKxXXE"}
         """
         Feed names and its input data:
 
@@ -104,7 +107,7 @@ class FaceScanner(FaceDetect, FaceUpdater, Scanner):
         face: frame with face detected: OpenCV frame
         paused: pausing status: bool -> True/False
         """
-        ada = Adafruit(info)
+        ada = Adafruit(self._ada_info)
         ada.connect()
         
         switch = 14  # switch statement for processing image
@@ -132,7 +135,7 @@ class FaceScanner(FaceDetect, FaceUpdater, Scanner):
 
                         print(faces[0][0])
                         # TODO: Add update() method here
-                        # self.update(faces[0][0])
+                        self.update(faces[0][0])
 
                 cv2.imshow('Face Scanner', frame)
 
@@ -154,10 +157,7 @@ class CodeScanner(CodeDetect, CodeUpdater, Scanner):
 
     def scan(self):
         paused = False
-
-        info = {"username":"fuisl",
-                "key":"aio_Zpqj39l0FDq745LDnw1P1zuKxXXE"}
-        ada = Adafruit(info)
+        ada = Adafruit(self._ada_info)
         ada.connect()
 
         while True:
@@ -175,7 +175,7 @@ class CodeScanner(CodeDetect, CodeUpdater, Scanner):
                     ada.send('paused', '1')
                     print(codes[0])
                     # TODO: Add update() method here
-                    # self.update(codes[0])
+                    self.update(codes[0])
 
                     # send image to adafruit
                     unknown = cv2.imread("./unknown.png")

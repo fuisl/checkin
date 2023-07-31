@@ -202,13 +202,13 @@ class TicketData(Server):
         })
 
         # check if there are enough tickets
-        if all_available_tickets.count() < quantity:
-            print("Not enough tickets!")
-            return {}
-        else:
-            tickets = list(all_available_tickets.limit(quantity))
+        # if all_available_tickets.count() < quantity:
+        #     print("Not enough tickets!")
+        #     return {}
+        # else:
+        tickets = list(all_available_tickets.limit(quantity))
 
-            self.__update_ticket_purchase_status(tickets)
+        self.__update_ticket_purchase_status(tickets)
 
         return tickets
 
