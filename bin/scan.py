@@ -1,9 +1,6 @@
 from detect import FaceDetect, CodeDetect
 from abc import ABC, abstractmethod
 from updater import FaceUpdater, CodeUpdater
-from adafruit import Adafruit
-import time_tracking
-import threading
 
 import cv2
 import re
@@ -66,10 +63,6 @@ class Scanner(ABC):
         else:
             raise ValueError("Invalid IP Address")
     
-    def set_ada_info(self, info:dict = {"username":"fuisl",
-                                        "key":"aio_tTnu32dUJzFAb2CAujEyANAQVnKl"}):
-        self._ada_info = info
-    
     def _is_valid_ip(self, address):
         """
         Check if a string is valid IP Address
@@ -109,12 +102,6 @@ class FaceScanner(FaceDetect, FaceUpdater, Scanner):
         face: frame with face detected: OpenCV frame
         paused: pausing status: bool -> True/False
         """
-        ada = Adafruit(self._ada_info)
-        ada.connect()
-
-        # start time tracking thread to show traffic
-        thread = threading.Thread(target=time_tracking.execute) 
-        thread.start()
 
         switch = 14  # switch statement for processing image
         while True:
@@ -128,22 +115,14 @@ class FaceScanner(FaceDetect, FaceUpdater, Scanner):
                 # process image for every 15 frames
                 if switch % 15 == 0:
                     faces = self.detect(frame_small,self._knn_clf, self._model_path)
-                
-                paused = ada.paused
 
                 if faces:  # if any face detected
                     frame = self.draw(frame, faces)
 
                     if (faces[0][0] != 'unknown') & (paused == False):
-                        time_tracking.increase_checkin_by_one()
                         
                         info = self.get_info(faces[0][0])
                         info_string = info['customer_id'] + ' - ' + info['name'] + ' - ' + info['class']
-                        ada.send('info', info_string)
-
-                        ada.paused = True
-                        ada.send('paused', '1')
-                        ada.send_img('face', frame)
 
                         print(faces[0][0])
                         # TODO: Add update() method here
@@ -169,29 +148,18 @@ class CodeScanner(CodeDetect, CodeUpdater, Scanner):
 
     def scan(self):
         paused = False
-        ada = Adafruit(self._ada_info)
-        ada.connect()
 
         while True:
             ret, frame = self.cap.read()
 
             if ret:
 
-                paused = ada.paused
-
                 codes = self.detect(frame)
                 self.draw(frame)
 
                 if (paused == False) & (codes != None):
-                    ada.paused = True
-                    ada.send('paused', '1')
                     print(codes[0])
-                    # TODO: Add update() method here
                     self.update(codes[0])
-
-                    # send image to adafruit
-                    unknown = cv2.imread("./unknown.png")
-                    ada.send_img('face', unknown)
 
                 cv2.imshow("Code Scanner", frame)
 
