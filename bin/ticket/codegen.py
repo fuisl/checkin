@@ -1,8 +1,7 @@
 import random
-import string, csv
-import pandas as pd
+import string
 
-def generate_ticket_code(ticket_info: dict, quantity=10, length=6, seed='presto'):
+def generate_ticket_code(ticket_info: dict, length=6, seed='presto'):
     """Generate a unique ticket code of specified length
     and return a list of ticket codes
     
@@ -16,14 +15,11 @@ def generate_ticket_code(ticket_info: dict, quantity=10, length=6, seed='presto'
         'WAENDERLUSTE': 4
         }
 
-    :param quantity: number of tickets need to be generated
     :param length: length of ticket code (default 6)
     :param seed: seed for random generator (default presto)"""
     # Initializing
 
-    #raise exception if ticket_classes quantity does not match the predefined quantity
-    if sum(ticket_info.values()) != quantity:
-        raise Exception('Quantity error!')
+    quantity = sum(ticket_info.values())  # Total number of tickets to be generated
     
     #class field
     ticket_classes = []
@@ -35,7 +31,7 @@ def generate_ticket_code(ticket_info: dict, quantity=10, length=6, seed='presto'
 
     tickets = list()  # Create an empty list for tickets
     random.seed(seed)
-    characters = string.ascii_uppercase + string.digits
+    characters = string.ascii_uppercase + string.digits  
     
     #generate and combine ticket data
     for i in range(quantity):
@@ -51,4 +47,25 @@ def generate_ticket_code(ticket_info: dict, quantity=10, length=6, seed='presto'
     if len(tickets) == quantity:
         print(f'{len(tickets)} code(s) created successfully!')
 
-    return tickets
+    return tickets  # Return the list of tickets data
+
+
+def generate_ticket_code(quantity=10, length=6, seed='presto'):
+    """Generate a unique ticket code of specified length
+    and return a list of ticket codes
+    
+    :param quantity: number of tickets need to be generated
+    :param length: length of ticket code (default 6)
+    :param seed: seed for random generator (default presto)"""
+    # Initializing
+    tickets = list()  # Create an empty list for tickets
+    random.seed(seed)
+    characters = string.ascii_uppercase + string.digits
+
+    for i in range(quantity):
+        ticket_code = ''.join(random.choice(characters) for _ in range(length))
+        tickets.append(ticket_code)
+
+    print(f'{len(tickets)} code(s) created successfully!')
+
+    return tickets  # Return the list of tickets codes
