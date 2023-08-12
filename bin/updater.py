@@ -1,6 +1,6 @@
 import pymongo
-from time_tracking import increase_checkin_by_one
 
+# TODO: make decorator for connection to database
 class Server(object):
     def __init__(self):
         self.__server = pymongo.MongoClient("mongodb://localhost:27017")
@@ -14,6 +14,7 @@ class Updater(Server):
         super().__init__()
         self._ticket_collection = self._database['ticket']
 
+    # TODO: refactor this method
     def _get_ticket_relevant_info(self, key: str, get_by_id: bool) -> list:
         '''
         Private method. Return a list of matching documents involving both user and ticket collections.
@@ -93,27 +94,32 @@ class FaceUpdater(Updater):
         Used for checkin with face recognition. 
         :param id: user id
         '''
-        get_ticket = self._get_ticket_relevant_info(key=id, get_by_id=True)
-        if get_ticket:
-            ticket_status = get_ticket[0]['checked']
+        # TODO: update status of ticket to relevant database
+        #
+        # get_ticket = self._get_ticket_relevant_info(key=id, get_by_id=True)
+        # if get_ticket:
+        #     ticket_status = get_ticket[0]['checked']
 
-        if ticket_status:
-            print('This ticket has been checked in!')
-        else:
-            increase_checkin_by_one()
-            self._ticket_collection.update_one(
-                {"user_id": id},
-                {"$set": {"checked": True}}
-            )
+        # if ticket_status:
+        #     print('This ticket has been checked in!')
+        # else:
+        #     self._ticket_collection.update_one(
+        #         {"user_id": id},
+        #         {"$set": {"checked": True}}
+        #     )
+
+        raise NotImplementedError
     
     def get_info(self, id: str):
         '''
         Used for getting user info by id.
         :param id: user id
         '''
-        get_ticket = self._get_ticket_relevant_info(key=id, get_by_id=True)
-        if get_ticket:
-            return get_ticket[0]
+        # get_ticket = self._get_ticket_relevant_info(key=id, get_by_id=True)
+        # if get_ticket:
+        #     return get_ticket[0]
+
+        raise NotImplementedError
 
 class CodeUpdater(Updater):
     def __init__(self):
@@ -124,31 +130,34 @@ class CodeUpdater(Updater):
         Used for code scanned checkin.
         :param ticket_code: the literal code (encoded after scanned) of the ticket
         '''
-        get_ticket = self._get_ticket_relevant_info(key=ticket_code, get_by_id=False)
-        if get_ticket:
-            ticket_status = get_ticket[0]['checked']
-        else:
-            print('Invalid ticket!')
-            return
+        # get_ticket = self._get_ticket_relevant_info(key=ticket_code, get_by_id=False)
+        # if get_ticket:
+        #     ticket_status = get_ticket[0]['checked']
+        # else:
+        #     print('Invalid ticket!')
+        #     return
 
-        #check validity
-        if ticket_status:
-            print('This ticket has been checked in!')
-        else:
-            increase_checkin_by_one()
-            self._ticket_collection.update_one(
-                {"_id": ticket_code},
-                {"$set": {"checked": True}}
-            )
+        # #check validity
+        # if ticket_status:
+        #     print('This ticket has been checked in!')
+        # else:
+        #     self._ticket_collection.update_one(
+        #         {"_id": ticket_code},
+        #         {"$set": {"checked": True}}
+        #     )
+
+        raise NotImplementedError
 
     def get_info(self, ticket_code: str):
         '''
         Used for getting user info by id.
         :param id: user id
         '''
-        get_ticket = self._get_ticket_relevant_info(key=ticket_code, get_by_id=False)
-        if get_ticket:
-            return get_ticket[0]
+        # get_ticket = self._get_ticket_relevant_info(key=ticket_code, get_by_id=False)
+        # if get_ticket:
+        #     return get_ticket[0]
+
+        raise NotImplementedError
 
 class Observer(Server):
     '''

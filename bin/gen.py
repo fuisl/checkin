@@ -22,7 +22,7 @@ class Gen:
         n = sum(ticket_info.values())
 
         # Generate codes and assign code to self.codes
-        codes = generate_ticket_code(ticket_info, n, seed=self.event_code)
+        codes = generate_ticket_code(ticket_info, seed=self.event_code)
 
         self.codes = codes
 
