@@ -34,24 +34,27 @@ class Updater:
         self.db["ticket"]
 
     # ticket_info
-    def add_ticket_info(self, code, rendered_code):  # add many ticket from csv file
+    def add_ticket_info(self, code: str):  # add 1 ticket info
+        raise NotImplementedError
+    
+    def add_ticket_info(self, codes: list):  # add many ticket info
         raise NotImplementedError
 
     # user_info
-    def set_user_info(self, csv_path: str):  # add many user info from csv file
+    def add_user_info(self, csv_path: str):  # add many user info from csv file
         raise NotImplementedError
 
     def add_user_info(self, info: dict):  # add 1 user info
         raise NotImplementedError
     
     # ticket
-    def set_ticket(self):  # connect ticket_info and user_info to ticket
+    def assign_ticket(self, user_id: str, code: str):  # assign 1 ticket to 1 user
         raise NotImplementedError
     
-    def add_ticket(self, ticket: dict):  # add 1 new ticket
+    # event_code
+    def register(self, csv_path: str):  # register many code to an event
         raise NotImplementedError
 
-    # event_code
     def register(self, code: str):  # register 1 code to an event
         raise NotImplementedError
     
