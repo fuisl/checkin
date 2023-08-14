@@ -1,6 +1,6 @@
 from detect import FaceDetect, CodeDetect
 from abc import ABC, abstractmethod
-from updater import FaceUpdater, CodeUpdater
+from updater import Updater
 
 import cv2
 import re
@@ -82,10 +82,10 @@ class Scanner(ABC):
         return url
     
 
-class FaceScanner(FaceDetect, FaceUpdater, Scanner):
+class FaceScanner(FaceDetect, Updater, Scanner):
     def __init__(self):
         super(Scanner, self).__init__()
-        super(FaceUpdater, self).__init__()
+        super(Updater, self).__init__()
         self._knn_clf = None
         self._model_path = None
 
@@ -120,13 +120,10 @@ class FaceScanner(FaceDetect, FaceUpdater, Scanner):
                     frame = self.draw(frame, faces)
 
                     if (faces[0][0] != 'unknown') & (paused == False):
-                        
-                        info = self.get_info(faces[0][0])
-                        info_string = info['customer_id'] + ' - ' + info['name'] + ' - ' + info['class']
-
+    
                         print(faces[0][0])
-                        # TODO: Add update() method here
-                        self.update(faces[0][0])
+
+                        self.update(faces[0][0])  # update to database
 
                 cv2.imshow('Face Scanner', frame)
 
@@ -141,10 +138,10 @@ class FaceScanner(FaceDetect, FaceUpdater, Scanner):
         cv2.destroyAllWindows()
     
 
-class CodeScanner(CodeDetect, CodeUpdater, Scanner):
+class CodeScanner(CodeDetect, Updater, Scanner):
     def __init__(self):
         super(Scanner, self).__init__()
-        super(CodeUpdater, self).__init__()
+        super(Updater, self).__init__()
 
     def scan(self):
         paused = False
@@ -159,7 +156,8 @@ class CodeScanner(CodeDetect, CodeUpdater, Scanner):
 
                 if (paused == False) & (codes != None):
                     print(codes[0])
-                    self.update(codes[0])
+
+                    self.update(codes[0])  # update to database
 
                 cv2.imshow("Code Scanner", frame)
 
