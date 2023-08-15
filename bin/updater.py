@@ -86,9 +86,13 @@ class Updater:
         self.db[self.event_code].insert_many(df.to_dict('records'))  # insert to event_code collection
 
     def register_one(self, user_id: str):  # register 1 user_id to an event
-        code = self.db['ticket'].find({'user_id':user_id}, {'code':1})
-        self.db[self.event_code].insert_one({'code':code, 'status':False})
+        codes = self.db['ticket'].find({'user_id':user_id}, {'code':1})
+        for c in codes:
+            self.db[self.event_code].insert_one({'code':c['code'], 'status':False})
     
+    def register_code(self, code: str):  # register 1 code to an event
+        self.db[self.event_code].insert_one({'code':code, 'status':False})
+
     def deregister(self, user_id: str):  # deregister id from an event
         cursor = self.db['ticket'].find({'user_id':user_id}, {'code':1})
         condition = {'code':{'$in':list(cursor)}}
