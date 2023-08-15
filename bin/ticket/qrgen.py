@@ -3,7 +3,7 @@ from qrcode import QRCode
 from qrcode.constants import ERROR_CORRECT_H, ERROR_CORRECT_L, ERROR_CORRECT_M, ERROR_CORRECT_Q
 from pathlib import Path
 
-def gen(codes:list, folder_path=None, transparent=False):
+def render(codes:list, folder_path=None, transparent=False):
     """
     Generate barcode using QRCode from a list of codes and
     export to a destinated folder, if not exist, automatically
