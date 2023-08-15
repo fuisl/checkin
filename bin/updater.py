@@ -23,6 +23,12 @@ class Updater:
     Class for updating ticket status
     '''
     def __init__(self, event_code:str):
+        """
+        Updater for updating ticket status in an event on MongoDB Atlas.
+
+        Parameter:
+            :event_code: Event code/Event room/Session code.
+        """
         self.client = connect()  # get client
         self.event_code = event_code
 
@@ -34,35 +40,62 @@ class Updater:
         self.db["ticket"]
 
     # ticket_info
-    def add_ticket_info(self, code: str):  # add 1 ticket info
-        raise NotImplementedError
+    def add_ticket_info_one(self, code: str):  # add 1 ticket info
+        self.db['ticket_info'].insert_one({'code':code, 'path':'', 'status':False})
     
-    def add_ticket_info(self, codes: list):  # add many ticket info
-        raise NotImplementedError
+    def add_ticket_info_many(self, codes: list):  # add many ticket info
+        self.db['ticket_info'].insert_many([{'code':code, 'path':'', 'status':False} for code in codes])
 
     # user_info
     def add_user_info(self, csv_path: str):  # add many user info from csv file
-        raise NotImplementedError
+        df = pd.read_csv(csv_path)
+        list_of_dict = df.to_dict('records')
+        self.db["user_info"].insert_many(list_of_dict)
 
     def add_user_info(self, info: dict):  # add 1 user info
-        raise NotImplementedError
+        """
+        Add 1 user info to database.
+
+        Must include id, name and email.
+
+        info = {'user_id': '...',
+                'name': '...',
+                'email': '...'}
+    
+        """
+        self.db["user_info"].insert_one(info)
     
     # ticket
-    def assign_ticket(self, user_id: str, code: str):  # assign 1 ticket to 1 user
-        raise NotImplementedError
-    
-    # event_code
-    def register(self, csv_path: str):  # register many code to an event
-        raise NotImplementedError
+    def assign_ticket(self, user_id: str):  # assign 1 ticket to 1 user
+        codes = self.db['ticket_info'].find({'status':False}, {'code':1})  # get all unused code
+        code = codes[0]['code']  # get 1 unused code
+        self.db['ticket'].insert_one({'user_id':user_id, 'code':code})  # insert to ticket collection
+        self.db['ticket_info'].update_one({'code':code}, {'$set':{'status':True}})  # update status of code to True
 
-    def register(self, code: str):  # register 1 code to an event
-        raise NotImplementedError
+    # event_code
+    def register_many(self, csv_path: str):  # register many code to an event from csv file of user_id
+        fil = {'user_id':{'$in':pd.read_csv(csv_path)['user_id'].tolist()}}  # filter by user_id
+        cursor = self.db['ticket'].find({fil}, {'code':1})  # get all code
+        
+        list_of_dict = list(cursor)
+        normalized_df = pd.json_normalize(list_of_dict)
+        df = pd.DataFrame(normalized_df)
+        
+        df['status'] = False  # add status column, default is False
+
+        self.db[self.event_code].insert_many(df.to_dict('records'))  # insert to event_code collection
+
+    def register_one(self, user_id: str):  # register 1 user_id to an event
+        code = self.db['ticket'].find({'user_id':user_id}, {'code':1})
+        self.db[self.event_code].insert_one({'code':code, 'status':False})
     
-    def deregister(self, code: str):  # deregister 1 code from an event
-        raise NotImplementedError
+    def deregister(self, user_id: str):  # deregister id from an event
+        cursor = self.db['ticket'].find({'user_id':user_id}, {'code':1})
+        condition = {'code':{'$in':list(cursor)}}
+        self.db[self.event_code].delete_many(condition)
 
     def update(self, code: str):  # update status of ticket in an event
-        raise NotImplementedError
+        self.db[self.event_code].update_one({'code':code}, {'$set':{'status':True}})
 
 if __name__ == "__main__":
     connect()
