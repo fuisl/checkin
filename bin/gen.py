@@ -2,8 +2,6 @@ from typing import Any
 from ticket.codegen import generate_ticket_code
 from ticket import qrgen, bargen
 
-from updater import TicketCode
-
 class Gen:
     def __init__(self, event_code=None) -> None:
         """
@@ -11,22 +9,18 @@ class Gen:
         """
         if event_code == None:  # set event_code if None
             self.event_code = 'default'
+        else:
+            self.event_code = event_code
 
         self.codes = []  # list of codes
 
-    def gen(self, ticket_info: dict) -> list:
+    def gen(self, quantity=10, length=6) -> list:
         """
         Initialize and return a list of n number of code.
         """
-        # Get number of tickets
-        n = sum(ticket_info.values())
-
-        # Generate codes and assign code to self.codes
-        codes = generate_ticket_code(ticket_info, seed=self.event_code)
-
-        self.codes = codes
-
-        TicketCode().create_tickets(codes) # Create tickets in database
+        self.codes = generate_ticket_code(quantity, length=length, seed=self.event_code)
+        
+        return self.codes
     
     def encode(self, codes=None, type='qr', transparent=False, custom_path=None):
         """
@@ -45,6 +39,6 @@ class Gen:
             codes = self.codes
         # Call generator
         if type == 'qr':
-            qrgen.gen(codes, custom_path, transparent)
+            qrgen.render(codes, custom_path, transparent)
         elif type == 'bar':
-            bargen.gen(codes, custom_path, transparent)
+            bargen.render(codes, custom_path, transparent)
