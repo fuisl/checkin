@@ -27,13 +27,6 @@ class Scanner(ABC):
     def scan():
         pass
 
-    @abstractmethod
-    def update():
-        """
-        Update detected code to database
-        """
-        pass
-
     def connect(self, ip=None, port='4747'):
         """
         Connect and setup camera for Scanner.
@@ -82,12 +75,12 @@ class Scanner(ABC):
         return url
     
 
-class FaceScanner(FaceDetect, Updater, Scanner):
-    def __init__(self):
+class FaceScanner(FaceDetect, Scanner):
+    def __init__(self, event_code):
         super(Scanner, self).__init__()
-        super(Updater, self).__init__()
         self._knn_clf = None
         self._model_path = None
+        self._updater = Updater(event_code)
 
     def load_model(self, knn_clf=None, model_path=None):
         self._knn_clf = knn_clf
@@ -121,9 +114,10 @@ class FaceScanner(FaceDetect, Updater, Scanner):
 
                     if (faces[0][0] != 'unknown') & (paused == False):
     
-                        print(faces[0][0])
-
-                        self.update(faces[0][0])  # update to database
+                        print(faces[0][0])  # print detected id
+                        self._updater.update(faces[0][0])  # update to database
+                        paused = True
+                        #TODO: display info on screen or print to console
 
                 cv2.imshow('Face Scanner', frame)
 
@@ -138,11 +132,11 @@ class FaceScanner(FaceDetect, Updater, Scanner):
         cv2.destroyAllWindows()
     
 
-class CodeScanner(CodeDetect, Updater, Scanner):
-    def __init__(self):
-        super(Scanner, self).__init__()
-        super(Updater, self).__init__()
-
+class CodeScanner(CodeDetect, Scanner):
+    def __init__(self, event_code):
+        super().__init__()
+        self._updater = Updater(event_code)
+        
     def scan(self):
         paused = False
 
@@ -155,9 +149,12 @@ class CodeScanner(CodeDetect, Updater, Scanner):
                 self.draw(frame)
 
                 if (paused == False) & (codes != None):
-                    print(codes[0])
+                    print(codes[0])  # print detected id
 
-                    self.update(codes[0])  # update to database
+                    self._updater.update(codes[0])  # update to database
+                    paused = True
+
+                    #TODO: display info on screen or print to console
 
                 cv2.imshow("Code Scanner", frame)
 
