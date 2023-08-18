@@ -101,5 +101,12 @@ class Updater:
     def update(self, code: str):  # update status of ticket in an event
         self.db[self.event_code].update_one({'code':code}, {'$set':{'status':True}})
 
+    def get_user_info(self, code):  # get user_info from code
+        user = self.db['ticket'].find_one({'code':code}, {'user_id':1})
+        
+        info = self.db['user_info'].find({'user_id':user['user_id']}, {'_id':0})
+
+        return list(info)[0]
+
 if __name__ == "__main__":
     connect()
