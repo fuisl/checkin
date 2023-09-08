@@ -4,7 +4,7 @@ from barcode.writer import ImageWriter
 from PIL import Image
 from pathlib import Path
 
-def gen(codes:list, folder_path=None, transparent=False):
+def render(codes:list, folder_path=None, transparent=False):
     """
     Generate barcode using Code 128 from a list of codes and
     export to a destinated folder, if not exist, automatically
@@ -35,7 +35,7 @@ def gen(codes:list, folder_path=None, transparent=False):
                        }
  
     for code in codes:
-        file_name = Path(code['_id']+'.png')
+        file_name = Path(code+'.png')
         file_path = path1.joinpath(file_name)
 
         with open(file_path, 'wb') as f:

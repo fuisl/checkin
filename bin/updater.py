@@ -1,201 +1,118 @@
-import pymongo
-from time_tracking import increase_checkin_by_one
+import pandas as pd
+from pymongo.mongo_client import MongoClient
 
-class Server(object):
-    def __init__(self):
-        self.__server = pymongo.MongoClient("mongodb://localhost:27017")
-        self._database = self.__server['web_db']
+def connect():
+    # Connect to MongoDB Atlas
 
-class Updater(Server):
+    uri = "mongodb+srv://fuisl:fv7MuQ7lpOlCQbRM@ori23.pdjh2im.mongodb.net/?retryWrites=true&w=majority"
+
+    # Create a new client and connect to the server
+    client = MongoClient(uri)
+
+    # Send a ping to confirm a successful connection
+    try:
+        client.admin.command('ping')
+        print("Pinged deployment. Successfully connected to MongoDB!")
+    except Exception as e:
+        print(e)
+
+    return client
+
+class Updater:
     '''
     Class for updating ticket status
     '''
-    def __init__(self):
-        super().__init__()
-        self._ticket_collection = self._database['ticket']
+    def __init__(self, event_code:str=None):
+        """
+        Updater for updating ticket status in an event on MongoDB Atlas.
 
-    def _get_ticket_relevant_info(self, key: str, get_by_id: bool) -> list:
-        '''
-        Private method. Return a list of matching documents involving both user and ticket collections.
-        :param key: is either the user id or the ticket code
-        :param get_by_id: defined pipeline for aggregation. True for getting data by user id, False for getting data by ticket code
-        '''
-        pipeline = []
-        if get_by_id:
-            pipeline = [
-                {
-                    "$lookup": {
-                        "from": "user",
-                        "localField": "user_id",
-                        "foreignField": "_id",
-                        "as": "User"
-                    }
-                },
-                {
-                    "$unwind": "$User"
-                },
-                {#difference
-                    "$match": {
-                        "User._id": key
-                    }
-                },
-                {
-                    "$project": {
-                        "customer_id": "$User._id",
-                        "name": "$User.name",
-                        "gender": "$User.gender",
-                        "checked": 1,
-                        "class": 1,
-                        "code_qr": 1
-                    }
-                }
-            ]
+        Parameter:
+            :event_code: Event code/Event room/Session code.
+        """
+        self.client = connect()  # get client
+        self.event_code = event_code
 
-        else:
-            pipeline = [
-                {
-                    "$lookup": {
-                        "from": "user",
-                        "localField": "user_id",
-                        "foreignField": "_id",
-                        "as": "User"
-                    }
-                },
-                {
-                    "$unwind": "$User"
-                },
-                {#difference
-                    "$match": {
-                        "_id": key
-                    }
-                },
-                {
-                    "$project": {
-                        "customer_id": "$User._id",
-                        "name": "$User.name",
-                        "gender": "$User.gender",
-                        "checked": 1,
-                        "class": 1,
-                        "code_qr": 1
-                    }
-                }
-            ]
-            
-        ticket_info = self._ticket_collection.aggregate(pipeline)
-        return list(ticket_info)
+        self.db = self.client['check-in']  # create new database
+        if event_code != None:
+            self.db[event_code]  # create new event_code collection
+        self.db["user_info"]
+        self.db["ticket_info"]
+        self.db["ticket"]
+
+    # ticket_info
+    def add_ticket_info_one(self, code: str):  # add 1 ticket info
+        self.db['ticket_info'].insert_one({'code':code, 'path':'', 'status':False})
     
-class FaceUpdater(Updater):
-    def __init__(self):
-        super().__init__()
+    def add_ticket_info_many(self, codes: list):  # add many ticket info
+        self.db['ticket_info'].insert_many([{'code':code, 'path':'', 'status':False} for code in codes])
 
-    def update(self, id: str):
-        '''
-        Used for checkin with face recognition. 
-        :param id: user id
-        '''
-        get_ticket = self._get_ticket_relevant_info(key=id, get_by_id=True)
-        if get_ticket:
-            ticket_status = get_ticket[0]['checked']
+    # user_info
+    def add_user_info(self, csv_path: str):  # add many user info from csv file
+        df = pd.read_csv(csv_path)
+        list_of_dict = df.to_dict('records')
+        self.db["user_info"].insert_many(list_of_dict)
 
-        if ticket_status:
-            print('This ticket has been checked in!')
-        else:
-            increase_checkin_by_one()
-            self._ticket_collection.update_one(
-                {"user_id": id},
-                {"$set": {"checked": True}}
-            )
+    def add_user_info(self, info: dict):  # add 1 user info
+        """
+        Add 1 user info to database.
+
+        Must include id, name and email.
+
+        info = {'user_id': '...',
+                'name': '...',
+                'email': '...'}
     
-    def get_info(self, id: str):
-        '''
-        Used for getting user info by id.
-        :param id: user id
-        '''
-        get_ticket = self._get_ticket_relevant_info(key=id, get_by_id=True)
-        if get_ticket:
-            return get_ticket[0]
-
-class CodeUpdater(Updater):
-    def __init__(self):
-        super().__init__()
-
-    def update(self, ticket_code: str):
-        '''
-        Used for code scanned checkin.
-        :param ticket_code: the literal code (encoded after scanned) of the ticket
-        '''
-        get_ticket = self._get_ticket_relevant_info(key=ticket_code, get_by_id=False)
-        if get_ticket:
-            ticket_status = get_ticket[0]['checked']
-        else:
-            print('Invalid ticket!')
-            return
-
-        #check validity
-        if ticket_status:
-            print('This ticket has been checked in!')
-        else:
-            increase_checkin_by_one()
-            self._ticket_collection.update_one(
-                {"_id": ticket_code},
-                {"$set": {"checked": True}}
-            )
-
-    def get_info(self, ticket_code: str):
-        '''
-        Used for getting user info by id.
-        :param id: user id
-        '''
-        get_ticket = self._get_ticket_relevant_info(key=ticket_code, get_by_id=False)
-        if get_ticket:
-            return get_ticket[0]
-
-class Observer(Server):
-    '''
-    Class used for observing database. Should be called after committing any changes.
-    '''
-    def __init__(self):
-        super().__init__()
-        self.__user_collection = self._database['user']
-        self.__ticket_collection = self._database['ticket']
+        """
+        self.db["user_info"].insert_one(info)
     
-    def show_data(self) -> list:
-        pipeline = [
-                {
-                    "$lookup": {
-                        "from": "user",
-                        "localField": "user_id",
-                        "foreignField": "_id",
-                        "as": "User"
-                    }
-                },
-                {
-                    "$unwind": "$User"
-                },
-                {
-                    "$project": {
-                        "_id": 0,
-                        "code": "$_id",
-                        "customer_id": "$User._id",
-                        "name": "$User.name",
-                        "gender": "$User.gender",
-                        "checked": 1,
-                        "class": 1,
-                        "code_qr": 1
-                    }
-                }
-            ]
+    # ticket
+    def assign_ticket(self, user_id: str):  # assign 1 ticket to 1 user
+        codes = self.db['ticket_info'].find({'status':False}, {'code':1})  # get all unused code
+        code = codes[0]['code']  # get 1 unused code
+        self.db['ticket'].insert_one({'user_id':user_id, 'code':code})  # insert to ticket collection
+        self.db['ticket_info'].update_one({'code':code}, {'$set':{'status':True}})  # update status of code to True
+
+    def get_ticket_all(self):
+        """
+        return a cursor for all {user_id - code}
+        """
+        return self.db['ticket'].find({}, {'_id':0})
+
+    # event_code
+    def register_many(self, csv_path: str):  # register many code to an event from csv file of user_id
+        fil = {'user_id':{'$in':pd.read_csv(csv_path)['user_id'].tolist()}}  # filter by user_id
+        cursor = self.db['ticket'].find({fil}, {'code':1})  # get all code
         
-        result = self.__ticket_collection.aggregate(pipeline)
-        return list(result)
+        list_of_dict = list(cursor)
+        normalized_df = pd.json_normalize(list_of_dict)
+        df = pd.DataFrame(normalized_df)
+        
+        df['status'] = False  # add status column, default is False
 
-class TicketCode(Server):
-    '''
-    Class to work with ticket_data collection
-    '''
-    def __init__(self):
-        super().__init__()
-        self.__ticket_data_collection = self._database['ticket_data']
+        self.db[self.event_code].insert_many(df.to_dict('records'))  # insert to event_code collection
 
-    def create_tickets(self, data: list):
-        self.__ticket_data_collection.insert_many(data)
+    def register_one(self, user_id: str):  # register 1 user_id to an event
+        codes = self.db['ticket'].find({'user_id':user_id}, {'code':1})
+        for c in codes:
+            self.db[self.event_code].insert_one({'code':c['code'], 'status':False})
+    
+    def register_code(self, code: str):  # register 1 code to an event
+        self.db[self.event_code].insert_one({'code':code, 'status':False})
+
+    def deregister(self, user_id: str):  # deregister id from an event
+        cursor = self.db['ticket'].find({'user_id':user_id}, {'code':1})
+        condition = {'code':{'$in':list(cursor)}}
+        self.db[self.event_code].delete_many(condition)
+
+    def update(self, code: str):  # update status of ticket in an event
+        self.db[self.event_code].update_one({'code':code}, {'$set':{'status':True}})
+
+    def get_user_info(self, code):  # get user_info from code
+        user = self.db['ticket'].find_one({'code':code}, {'user_id':1})
+        
+        info = self.db['user_info'].find({'user_id':user['user_id']}, {'_id':0})
+
+        return list(info)[0]
+
+if __name__ == "__main__":
+    connect()
