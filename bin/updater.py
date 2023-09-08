@@ -22,7 +22,7 @@ class Updater:
     '''
     Class for updating ticket status
     '''
-    def __init__(self, event_code:str):
+    def __init__(self, event_code:str=None):
         """
         Updater for updating ticket status in an event on MongoDB Atlas.
 
@@ -33,8 +33,8 @@ class Updater:
         self.event_code = event_code
 
         self.db = self.client['check-in']  # create new database
-
-        self.db[event_code]  # create new event_code collection
+        if event_code != None:
+            self.db[event_code]  # create new event_code collection
         self.db["user_info"]
         self.db["ticket_info"]
         self.db["ticket"]
@@ -71,6 +71,12 @@ class Updater:
         code = codes[0]['code']  # get 1 unused code
         self.db['ticket'].insert_one({'user_id':user_id, 'code':code})  # insert to ticket collection
         self.db['ticket_info'].update_one({'code':code}, {'$set':{'status':True}})  # update status of code to True
+
+    def get_ticket_all(self):
+        """
+        return a cursor for all {user_id - code}
+        """
+        return self.db['ticket'].find({}, {'_id':0})
 
     # event_code
     def register_many(self, csv_path: str):  # register many code to an event from csv file of user_id
