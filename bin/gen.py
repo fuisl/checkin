@@ -27,6 +27,7 @@ class Gen:
         Encode codes into QRCode/Barcode.
 
         Parameters:
+        :codes: list of codes to encode.
         :type: qr or bar.
         :transparent: settings for transparent background.
         :custom_path: path folder to export encoded files.

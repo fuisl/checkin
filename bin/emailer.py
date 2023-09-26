@@ -4,22 +4,22 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 
-sender = "fuisloy@gmail.com"
-receiver = "10621018@student.vgu.edu.vn"
-
-def send_email(code):
+def send_email(info: dict):
     msg = MIMEMultipart()
-    msg["From"] = sender
-    msg["To"] = receiver
-    msg["Subject"] = "[Presto] VGU By Night Ticket"
+    msg["From"] = info["from"]
+    msg["To"] = info["to"]
+    msg["Subject"] = info["subject"]
 
-    with open(f"bin/template/email_template.html") as template: # TODO: Replace with information from the database
-        body = template.read().replace("[code]", code)
-        body = body.replace("[name]", "Phuong Linh")
-        body = body.replace("(#000000)", "(#10621018)")
+    template = info["template"]
+    code = info["code"]
+
+    with open(f"./template/ied23.html") as template: # TODO: Replace with information from the database
+        body = template.read().replace("[code]", info['code'])
+        body = body.replace("[name]", info['name'])
+        body = body.replace("(#000000)", '(' + info['number'] + ')')
         msg.attach(MIMEText(body, "html"))
 
-    with open(f"bin/qrcodes/{code}.png", "rb") as attachment:
+    with open(f"./qrcodes/{code}.png", "rb") as attachment:
         img = MIMEImage(attachment.read())
         img.add_header('Content-ID', 'qr')
         msg.attach(img)
@@ -30,9 +30,22 @@ def send_email(code):
     server = smtplib.SMTP("smtp.gmail.com", 587)
     server.ehlo()
     server.starttls()
-    server.login(sender, "zzsfmfvfposwxqwh")
-    server.sendmail(sender, receiver, text)
+    server.login(info['from'], info['key'])
+    server.sendmail(info['from'], info['to'], text)
     server.quit()
 
+
+
 if __name__ == "__main__":
-    send_email('V79OC3')
+    info = {
+    "from": "presto@vgu.edu.vn",
+    "to":"10422021@student.vgu.edu.vn",
+    "subject": "[IED23] Entrance Ticket",
+    "template": "ied23.html",
+    "name": "CSE2022",
+    "number": "#CSE2022",
+    "code": "CSE2022",
+    "key": "yfatdzsmgfhtokzk"
+    }
+
+    send_email(info)

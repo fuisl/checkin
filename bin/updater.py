@@ -113,6 +113,10 @@ class Updater:
         info = self.db['user_info'].find({'user_id':user['user_id']}, {'_id':0})
 
         return list(info)[0]
+    
+    def count(self, code): # count number of scan with a ticket code.
+        return self.db[self.event_code].update_one({'code':code}, {'$inc':{'count':1}})
+
 
 if __name__ == "__main__":
     connect()

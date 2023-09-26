@@ -9,7 +9,6 @@ import sys
 class Scanner(ABC):
     def __init__(self):
         self.cap = None
-        self._ada_info = {} # adafruit info
 
     def __del__(self):
         self.cap.release()
@@ -151,7 +150,8 @@ class CodeScanner(CodeDetect, Scanner):
                 if (paused == False) & (codes != None):
                     print(codes[0])  # print detected id
 
-                    self._updater.update(codes[0])  # update to database
+                    # self._updater.update(codes[0])  # update to database
+                    self._updater.count(codes[0])  # count number of people have scanned.
                     paused = True
 
                     #TODO: display info on screen or print to console
