@@ -3,6 +3,9 @@ from abc import ABC, abstractmethod
 import cv2
 from pyzbar import pyzbar
 
+"""
+This modules contains the abstract class DetectBehavior and its concrete implementation CodeDetect.
+"""
 
 class DetectBehavior(ABC):
 
@@ -42,6 +45,9 @@ class CodeDetect(DetectBehavior):
     def draw(self, frame):
         """
         Draw a red box around detected QR/Barcode to the imported frame
+
+        Parameter:
+        :frame: OpenCV frame.
         """
         # Convert frame to gray scale for processing
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
