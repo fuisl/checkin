@@ -31,7 +31,7 @@ class CodeDetect(DetectBehavior):
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         # Decode frame and extract codes from frame
-        objs = pyzbar.decode(gray)
+        objs = pyzbar.decode(gray)  # TODO: change to OpenCV QR/Barcode detection
         
         codes = []  # initialize empty list
         for obj in objs:

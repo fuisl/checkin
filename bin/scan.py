@@ -1,4 +1,4 @@
-from detect import FaceDetect, CodeDetect
+from detect import CodeDetect
 from abc import ABC, abstractmethod
 # from updater import Updater
 
@@ -75,6 +75,12 @@ class Scanner(ABC):
 
 class CodeScanner(CodeDetect, Scanner):
     def __init__(self, event_code):
+        """
+        Initialize CodeScanner class
+
+        Parameter:
+            :event_code: Event code to scan. It's a MUST to declare event code.
+        """
         super().__init__()
         # self._updater = Updater(event_code)
         
