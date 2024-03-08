@@ -86,6 +86,8 @@ class CodeScanner(CodeDetect, Scanner):
         
     def scan(self):
         paused = False
+        count = 0
+        prev_code = None
 
         while True:
             ret, frame = self.cap.read()
@@ -95,9 +97,25 @@ class CodeScanner(CodeDetect, Scanner):
                 codes = self.detect(frame)
                 self.draw(frame)
 
-                if (paused == False) & (codes != None):
-                    print(codes[0])  # print detected id
+                """
+                If no code is detected, 
+                count the number of frames. 
+                If the number of frames is greater than 30, 
+                reset the paused state to False.
+                """
+                if codes == None:
+                    count += 1
+                    if count > 30:  # 45 frames = 1.5 seconds
+                        paused = False
+                        count = 0
 
+                """
+                If code is detected, and not because the code is flickering,
+                do some action.
+                """
+                if (paused == False) & (codes != None) & (codes != prev_code):
+                    print(codes[0])  # print detected id
+                    prev_code = codes  # store detected id
                     # self._updater.update(codes[0])  # update to database
                     # self._updater.count(codes[0])  # count number of people have scanned.
                     paused = True
