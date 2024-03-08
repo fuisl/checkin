@@ -1,22 +1,22 @@
 import pandas as pd
-from pymongo.mongo_client import MongoClient
+# from pymongo.mongo_client import MongoClient
 
-def connect():
-    # Connect to MongoDB Atlas
+# def connect():
+#     # Connect to MongoDB Atlas
 
-    uri = "mongodb+srv://fuisl:fv7MuQ7lpOlCQbRM@ori23.pdjh2im.mongodb.net/?retryWrites=true&w=majority"
+#     uri = "mongodb+srv://fuisl:fv7MuQ7lpOlCQbRM@ori23.pdjh2im.mongodb.net/?retryWrites=true&w=majority"
 
-    # Create a new client and connect to the server
-    client = MongoClient(uri)
+#     # Create a new client and connect to the server
+#     client = MongoClient(uri)
 
-    # Send a ping to confirm a successful connection
-    try:
-        client.admin.command('ping')
-        print("Pinged deployment. Successfully connected to MongoDB!")
-    except Exception as e:
-        print(e)
+#     # Send a ping to confirm a successful connection
+#     try:
+#         client.admin.command('ping')
+#         print("Pinged deployment. Successfully connected to MongoDB!")
+#     except Exception as e:
+#         print(e)
 
-    return client
+#     return client
 
 class Updater:
     '''
@@ -29,7 +29,7 @@ class Updater:
         Parameter:
             :event_code: Event code/Event room/Session code.
         """
-        self.client = connect()  # get client
+        # self.client = connect()  # get client
         self.event_code = event_code
 
         self.db = self.client['check-in']  # create new database
@@ -119,4 +119,5 @@ class Updater:
 
 
 if __name__ == "__main__":
-    connect()
+    # connect()
+    pass

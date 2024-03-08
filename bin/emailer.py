@@ -4,6 +4,12 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 
+"""
+Bulk emailer for sending emails to students.
+
+FIXME: Cannot bulk sending --> wrong methods, take longs to send --> queueing issue.
+"""
+
 def send_email(info: dict):
     msg = MIMEMultipart()
     msg["From"] = info["from"]
@@ -45,7 +51,7 @@ if __name__ == "__main__":
     "name": "CSE2022",
     "number": "#CSE2022",
     "code": "CSE2022",
-    "key": "yfatdzsmgfhtokzk"
+    "key": ""
     }
 
     send_email(info)
