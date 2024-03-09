@@ -13,7 +13,7 @@ class GenerateTicketInfo():
         :param seats_per_row {int}
     """
 
-    def __init__(self, ticket_info, codes, rows, seats_per_row) -> None:
+    def __init__(self, ticket_info, codes, rows=7, seats_per_row=28) -> None:
         self.ticket_info = ticket_info
         self.codes = codes
         self.rows = rows
@@ -159,17 +159,60 @@ class Database():
         :param connection_string {str}
         :param db_name {str}: name of the initial collection
     """
-    def __init__(self, generated_tickets_info, connection_string="mongodb://localhost:27017", db_name="checkin_presto", initial_collection='tickets') -> None:
-        assert len(generated_tickets_info) > 0, "No ticket info"
-
+    def __init__(self, generated_tickets_info=None, connection_string="mongodb://localhost:27017", db_name="checkin_presto", initial_collection='tickets') -> None:
         self.initial_collection = initial_collection
         self.database = pymongo.MongoClient(connection_string)[db_name]
-        self.ticket_collection = self.database['tickets']
+        self.tickets_collection = self.database['tickets']
+        self.pending_tickets_collection = self.database['pending_tickets']
         self.generated_tickets_info = generated_tickets_info
 
     def create_database(self) -> None:
         """Create the initial collection"""
+        assert len(self.generated_tickets_info) > 0, "No ticket info"
         assert self.initial_collection not in self.database.list_collection_names(), "Collection already existed."
 
         print(f"Creating database with {len(self.generated_tickets_info)} tickets in '{self.initial_collection}' collection.")
-        self.ticket_collection.insert_many(self.generated_tickets_info)
+        self.tickets_collection.insert_many(self.generated_tickets_info)
+
+    def buy_ticket(self, buyer_info) -> None:
+        """
+        Called when a customer buy ticket(s).
+
+        Arguments:
+            :param buyer_info {dict}: customer information, buyer_info.keys() == ['name', 'email', 'phone', 'seats'{list}]
+        
+        Raise:
+            AssertionError -> if any ticket having similar seat ids is already bought (is_bought == True)
+        """
+
+        condition = {
+            'seat': {'$in': buyer_info['seats']},
+            'is_bought': False
+        }
+
+        # query all available tickets
+        available_tickets = self.tickets_collection.find(condition)
+        assert len(list(available_tickets.clone())) == len(buyer_info['seats']), "Unavailable ticket(s)!"
+
+        buy_tickets_list = []
+
+        # complete all documents for processing tickets
+        for ticket in available_tickets:
+            ticket_data = {
+                '_id': ticket['_id'],
+                'name': buyer_info['name'],
+                'email': buyer_info['email'],
+                'phone': buyer_info['phone'],
+                'seat': ticket['seat'],
+                'class': ticket['class'],
+                'checked_in': False
+            }
+
+            buy_tickets_list.append(ticket_data)
+                
+        print(f'Adding {buy_tickets_list} to database.')
+
+        # insert processed documents and change is_bought=True of bought tickets
+        self.tickets_collection.update_many({'_id': {'$in': [ticket['_id'] for ticket in buy_tickets_list]}}, {"$set": {"is_bought": True}})
+        insert_result = self.pending_tickets_collection.insert_many(buy_tickets_list)
+        print(f'Inserted {len(list(insert_result.inserted_ids))} documents.')
