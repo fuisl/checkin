@@ -70,6 +70,6 @@ class CodeDetect(DetectBehavior):
             pts = pts.reshape((-1, 1, 2))
 
             # Draw the curved box around the corners
-            cv2.polylines(frame, [pts], True, (0, 0, 255), 2)
+            cv2.polylines(frame, [pts], True, (0, 0, 255), 4)
 
         return frame

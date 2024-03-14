@@ -94,14 +94,14 @@ class CodeScanner(CodeDetect, Scanner):
 
             # Calculate and display FPS on top of the screen
             fps = self.cap.get(cv2.CAP_PROP_FPS)
-            cv2.putText(frame, f"FPS: {int(fps)}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            cv2.putText(frame, f"FPS: {int(fps)}", (10, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 255, 0), 1)
             if ret:
 
                 codes = self.detect(frame)
                 self.draw(frame)
 
                 if codes is not None:
-                    cv2.putText(frame, f"{codes[0]}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (12, 196, 255), 2)
+                    cv2.putText(frame, f"{codes[0]}", (10, 60), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (12, 196, 255), 1)
 
                 """
                 If no code is detected, 
