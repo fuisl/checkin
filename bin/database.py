@@ -18,13 +18,13 @@ class GenerateTicketInfo():
         self.codes = codes
         self.rows = rows
         self.seats_per_row = seats_per_row
-        self.vvip_seat_ids = self.__generate_vvip_ids()
+        self.svip_seat_ids = self.__generate_svip_ids()
 
-    def __generate_vvip_ids(self) -> list:
+    def __generate_svip_ids(self) -> list:
         """
-        Return seat ids for VVIP class, format 'vvip{number(0->vvip_quantity)}'
+        Return seat ids for SVIP class, format 'svip_{number(0->svip_quantity)}'
         """
-        return [f'vvip{i}' for i in range(self.ticket_info['vvip'])]
+        return [f'svip{i}' for i in range(1, self.ticket_info['svip']+1)]
 
     def __generate_cinema_seats(self) -> list:
         """
@@ -35,7 +35,7 @@ class GenerateTicketInfo():
         result_seats = []
 
         for letter in ascii_uppercase[:self.rows]:
-            seat_ids = [f'{letter}{number}' for number in range(self.seats_per_row)]
+            seat_ids = [f'{letter}{number}' for number in range(1, self.seats_per_row + 1)]
             result_seats.extend(seat_ids)
 
         return result_seats
@@ -45,7 +45,7 @@ class GenerateTicketInfo():
         Distribute generated seat ids to theirs classes.
         """
 
-        def separate_center_rear_ids(seat_ids, start_col_id=7, end_col_id=20) -> tuple:
+        def separate_center_rear_ids(seat_ids, start_col_id=8, end_col_id=21) -> tuple:
             """Separate seat ids of the center section and rear section. (start_col_id < end_col_id)
             Argument:
                 :param seat_ids {list}: all generated codes
@@ -68,7 +68,7 @@ class GenerateTicketInfo():
 
             return center_ids, rear_ids
         
-        def separate_center_vip_norm_ids(seat_ids, start_row_letter='B', end_row_letter='E') -> tuple:
+        def separate_center_vip_norm_ids(seat_ids, start_letter='B', end_letter='E', start_number=11, end_number=18) -> tuple:
             """Separate seat ids vip class and standard_center section. (start_row_letter < end_row_letter in ascii)
             Argument:
                 :param seat_ids {list}: codes of center section
@@ -77,10 +77,10 @@ class GenerateTicketInfo():
             Return:
                 tuple -> (seat ids of vip, seat ids of standard_center)
             """
-            assert len(start_row_letter) == 1 and len(end_row_letter) == 1, "Start and end letters should only have length 1"
+            assert len(start_letter) == 1 and len(end_letter) == 1, "Start and end letters should only have length 1"
 
-            first_letter_index = ascii_uppercase.find(start_row_letter.upper())
-            second_letter_index = ascii_uppercase.find(end_row_letter.upper())
+            first_letter_index = ascii_uppercase.find(start_letter.upper())
+            second_letter_index = ascii_uppercase.find(end_letter.upper())
             assert first_letter_index!=-1 and second_letter_index!=-1, "Invalid input row letters"
             assert second_letter_index > first_letter_index
 
@@ -88,7 +88,7 @@ class GenerateTicketInfo():
             vip_ids = []
 
             for id in seat_ids:
-                if id[0] in ascii_uppercase[first_letter_index:second_letter_index+1]:
+                if id[0] in ascii_uppercase[first_letter_index:second_letter_index+1] and int(id[1:]) in range(start_number, end_number+1):
                     vip_ids.append(id)
                     continue
 
@@ -106,7 +106,7 @@ class GenerateTicketInfo():
         """
         self.__distribute_seat_ids()
         tickets_dict = {
-            "vvip" : self.vvip_seat_ids,
+            "svip" : self.svip_seat_ids,
             "vip" : self.vip_ids,
             "norm_center" : self.norm_center_ids,
             "norm_rear" : self.norm_rear_ids
