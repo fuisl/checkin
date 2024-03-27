@@ -174,31 +174,28 @@ class Database():
         print(f"Creating database with {len(self.generated_tickets_info)} tickets in '{self.initial_collection}' collection.")
         self.tickets_collection.insert_many(self.generated_tickets_info)
 
-    def buy_ticket(self, buyer_info) -> None:
+    def buy_ticket(self, buyer_info) -> str:
         """
-        Called when a customer buy ticket(s).
+        Called when a customer buy a ticket. Return the code of that ticket.
 
         Arguments:
-            :param buyer_info {dict}: customer information, buyer_info.keys() == ['name', 'email', 'phone', 'seats'{list}]
+            :param buyer_info {dict}: customer information, buyer_info.keys() == ['name', 'email', 'phone', 'seat']
         
         Raise:
             AssertionError -> if any ticket having similar seat ids is already bought (is_bought == True)
         """
 
         condition = {
-            'seat': {'$in': buyer_info['seats']},
+            'seat': buyer_info['seat'],
             'is_bought': False
         }
 
         # query all available tickets
-        available_tickets = self.tickets_collection.find(condition)
-        assert len(list(available_tickets.clone())) == len(buyer_info['seats']), "Unavailable ticket(s)!"
-
-        buy_tickets_list = []
+        ticket = self.tickets_collection.find_one(condition)
+        assert ticket != None, "Unavailable ticket!"
 
         # complete all documents for processing tickets
-        for ticket in available_tickets:
-            ticket_data = {
+        ticket_data = {
                 '_id': ticket['_id'],
                 'name': buyer_info['name'],
                 'email': buyer_info['email'],
@@ -207,12 +204,12 @@ class Database():
                 'class': ticket['class'],
                 'checked_in': False
             }
-
-            buy_tickets_list.append(ticket_data)
                 
-        print(f'Adding {buy_tickets_list} to database.')
+        print(f'Bought ticket with seat {ticket}.')
 
         # insert processed documents and change is_bought=True of bought tickets
-        self.tickets_collection.update_many({'_id': {'$in': [ticket['_id'] for ticket in buy_tickets_list]}}, {"$set": {"is_bought": True}})
-        insert_result = self.pending_tickets_collection.insert_many(buy_tickets_list)
-        print(f'Inserted {len(list(insert_result.inserted_ids))} documents.')
+        self.tickets_collection.update_one({'_id': ticket_data['_id']}, {"$set": {"is_bought": True}})
+        insert_result = self.pending_tickets_collection.insert_one(ticket_data)
+        print(f'Inserted {insert_result.inserted_id} document.')
+
+        return ticket_data['_id']
