@@ -165,6 +165,12 @@ class Database():
         self.tickets_collection = self.database['tickets']
         self.pending_tickets_collection = self.database['pending_tickets']
         self.generated_tickets_info = generated_tickets_info
+        self.class_converter = {
+            'SVIP': 'DAU THANG',
+            'VIP': 'DAU GIANG',
+            'NORM_CENTER': 'DAU LUU',
+            'NORM_REAR': 'DAU LUYEN'
+        }
 
     def create_database(self) -> None:
         """Create the initial collection"""
@@ -213,3 +219,46 @@ class Database():
         print(f'Inserted {insert_result.inserted_id} document.')
 
         return ticket_data['_id']
+    
+    def checkin(self, code) -> dict:
+        """
+        Called when a ticket is scanned by the checkin module. Return the data of that ticket code.
+
+        Arguments:
+            :param code {str}: code of the ticket
+        
+        Raise:
+            AssertionError -> if a ticket code has field checked_in=True
+
+        Return:
+            dict -> data associated to the ticket
+            {
+                'name': customer name,
+                'email': customer email,
+                'seat': corresponding seat id,
+                'class': converted class from the database. Class converter is assigned in __init__
+            }
+        """
+
+        condition = {
+            '_id': code,
+            'checked_in': False
+        }
+
+        ticket_existence = self.pending_tickets_collection.count_documents({'_id': code})
+        assert ticket_existence == 1, f"Ticket code {code} does not exist!"
+
+        ticket = self.pending_tickets_collection.find_one(condition)
+        assert ticket != None, f"Ticket code {code} already checked in!"
+
+        return_dict = {
+            'name': ticket['name'],
+            'email': ticket['email'],
+            'seat': ticket['seat'],
+            'class': self.class_converter[ticket['class']]
+        }
+
+        # change checked_in=True for this ticket
+        self.pending_tickets_collection.update_one({'_id': ticket['_id']}, {"$set": {"checked_in": True}})
+
+        return return_dict
