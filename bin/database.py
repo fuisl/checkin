@@ -222,7 +222,7 @@ class Database():
     
     def checkin(self, code) -> dict:
         """
-        Called when a ticket is scanned by the checkin module. Return the data of that ticket code.
+        Called when a ticket is scanned by the checkin module. Return the data of that ticket code or None if the ticket is already checked in.
 
         Arguments:
             :param code {str}: code of the ticket
@@ -231,6 +231,10 @@ class Database():
             AssertionError -> if a ticket code has field checked_in=True
 
         Return:
+            None if ticket is already checked in
+            
+            or
+            
             dict -> data associated to the ticket
             {
                 'name': customer name,
@@ -249,7 +253,9 @@ class Database():
         assert ticket_existence == 1, f"Ticket code {code} does not exist!"
 
         ticket = self.pending_tickets_collection.find_one(condition)
-        assert ticket != None, f"Ticket code {code} already checked in!"
+
+        if ticket == None:
+            return ticket
 
         return_dict = {
             'name': ticket['name'],
