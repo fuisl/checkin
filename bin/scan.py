@@ -7,8 +7,9 @@ import re
 import sys
 
 class Scanner(ABC):
-    def __init__(self):
+    def __init__(self, index=0):
         self.cap = None
+        self.cam_index = index
 
     def __del__(self):
         self.cap.release()
@@ -35,7 +36,7 @@ class Scanner(ABC):
         """
         if ip == None:
             print("Connecting to default camera...")
-            self.cap = cv2.VideoCapture(0)
+            self.cap = cv2.VideoCapture(self.index)
             if self.cap.isOpened():
                 print("Connected successfully!")
 
@@ -47,7 +48,7 @@ class Scanner(ABC):
                 print("Connected successfully!")
             else:
                 print("Failed to connect to camera. Switching to default camera...")
-                self.cap = cv2.VideoCapture(0)
+                self.cap = cv2.VideoCapture(self.index)
 
                 if not self.cap.isOpened():
                     raise RuntimeError("Failed to connect to default camera!")
