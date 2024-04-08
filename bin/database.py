@@ -268,3 +268,29 @@ class Database():
         self.pending_tickets_collection.update_one({'_id': ticket['_id']}, {"$set": {"checked_in": True}})
 
         return return_dict
+    
+    def uncheck_all(self) -> int:
+        filter = {
+            "checked_in": True
+        }
+
+        update = {
+            "$set": {"checked_in": False}
+        }
+
+        update_result = self.pending_tickets_collection.update_many(filter, update)
+
+        return update_result.modified_count
+    
+    def uncheck_one(self, code) -> str:
+        filter = {
+            "_id": code
+        }
+
+        update = {
+            "$set": {"checked_in": False}
+        }
+
+        update_result = self.pending_tickets_collection.update_one(filter, update)
+
+        return update_result.upserted_id

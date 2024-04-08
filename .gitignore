@@ -161,4 +161,6 @@ cython_debug/
 
 *.pkl
 *.csv
-mail/
+bin/mail/
+dump/
+bin/test.ipynb
