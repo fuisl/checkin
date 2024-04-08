@@ -72,14 +72,23 @@ class Scanner(ABC):
         """
         url = 'http://' + ip + ':' + port + '/video'
         return url
+    
+    def update(self, event_code):
+        """
+        Update event code to database
+
+        Parameter:
+            :event_code: Event code to update
+        """
+        pass
 
 class CodeScanner(CodeDetect, Scanner):
-    def __init__(self, event_code):
+    def __init__(self, event_code=None):
         """
         Initialize CodeScanner class
 
         Parameter:
-            :event_code: Event code to scan. It's a MUST to declare event code.
+            :event_code: Event code to scan. It's a practice to declare event code.
         """
         super().__init__()
         # self._updater = Updater(event_code)
@@ -124,6 +133,7 @@ class CodeScanner(CodeDetect, Scanner):
                     prev_code = codes  # store detected id
                     # self._updater.update(codes[0])  # update to database
                     # self._updater.count(codes[0])  # count number of people have scanned.
+                    self.update(codes[0])  # update to database
                     paused = True
 
                     #TODO: display info on screen or print to console
