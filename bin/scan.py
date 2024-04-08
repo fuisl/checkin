@@ -97,20 +97,21 @@ class CodeScanner(CodeDetect, Scanner):
         paused = False
         count = 0
         prev_code = None
+        valid = None
+        valid_count = 0
 
         while True:
             ret, frame = self.cap.read()
 
             # Calculate and display FPS on top of the screen
-            fps = self.cap.get(cv2.CAP_PROP_FPS)
-            cv2.putText(frame, f"FPS: {int(fps)}", (10, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 255, 0), 1)
+            # fps = self.cap.get(cv2.CAP_PROP_FPS)
+            # cv2.putText(frame, f"FPS: {int(fps)}", (10, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 255, 0), 1)
             if ret:
-
                 codes = self.detect(frame)
                 self.draw(frame)
 
                 if codes is not None:
-                    cv2.putText(frame, f"{codes[0]}", (10, 60), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (12, 196, 255), 1)
+                    cv2.putText(frame, f"{codes[0]}", (10, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (12, 196, 255), 1)
 
                 """
                 If no code is detected, 
@@ -120,9 +121,13 @@ class CodeScanner(CodeDetect, Scanner):
                 """
                 if codes == None:
                     count += 1
+                    valid_count += 1
                     if count > 30:  # 45 frames = 1.5 seconds
                         paused = False
                         count = 0
+                    if valid_count > 90:  # 90 frames = 3 seconds
+                        valid = None
+                        valid_count = 0
 
                 """
                 If code is detected, and not because the code is flickering,
@@ -133,10 +138,19 @@ class CodeScanner(CodeDetect, Scanner):
                     prev_code = codes  # store detected id
                     # self._updater.update(codes[0])  # update to database
                     # self._updater.count(codes[0])  # count number of people have scanned.
-                    self.update(codes[0])  # update to database
+                    result = self.update(codes[0])  # update to database
+                    if result != None:
+                        valid = True
+                    else:
+                        valid = False
                     paused = True
 
                     #TODO: display info on screen or print to console
+                
+                if valid == True:
+                    cv2.putText(frame, "Valid", (10, 60), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 255, 0), 1)
+                elif valid == False:
+                    cv2.putText(frame, "Invalid", (10, 60), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), 1)
 
                 cv2.imshow("Code Scanner", frame)
 
