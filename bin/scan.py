@@ -36,7 +36,7 @@ class Scanner(ABC):
         """
         if ip == None:
             print("Connecting to default camera...")
-            self.cap = cv2.VideoCapture(self.index)
+            self.cap = cv2.VideoCapture(self.cam_index)
             if self.cap.isOpened():
                 print("Connected successfully!")
 
@@ -48,7 +48,7 @@ class Scanner(ABC):
                 print("Connected successfully!")
             else:
                 print("Failed to connect to camera. Switching to default camera...")
-                self.cap = cv2.VideoCapture(self.index)
+                self.cap = cv2.VideoCapture(self.cam_index)
 
                 if not self.cap.isOpened():
                     raise RuntimeError("Failed to connect to default camera!")
