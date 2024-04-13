@@ -95,6 +95,11 @@ class CodeScanner(CodeDetect, Scanner):
         # self._updater = Updater(event_code)
         
     def scan(self):
+        """
+        Scan method will start connnected camera and start scanning for QR Code. With using OpenCV display, this module will also display the detected QR Code on the screen.
+
+        If the detected QR Code is not flickering, it will update the detected QR Code to the database. 
+        """
         paused = False
         count = 0
         prev_code = None
@@ -119,6 +124,9 @@ class CodeScanner(CodeDetect, Scanner):
                 count the number of frames. 
                 If the number of frames is greater than 30, 
                 reset the paused state to False.
+
+                If the number of frames is greater than 90,
+                reset the valid state to None. --> use to display valid state on screen.
                 """
                 if codes == None:
                     count += 1
@@ -140,6 +148,8 @@ class CodeScanner(CodeDetect, Scanner):
                     # self._updater.update(codes[0])  # update to database
                     # self._updater.count(codes[0])  # count number of people have scanned.
                     result = self.update(codes[0])  # update to database
+
+                    # Check if the detected code is valid or not; VALID is when the return value is not None
                     if result != None:
                         valid = True
                     else:
