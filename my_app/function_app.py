@@ -34,15 +34,10 @@ def render_qr(code):
     )
     qr.add_data(code)
     qr.make(fit=True)
-
-    logging.info(f"QR code generated for {code}")
-
     img = qr.make_image(fill_color="black", back_color="white")
-    logging.info(f"No error before call buffered.")
     buffered = BytesIO()
-    logging.info(f"No error before saving.")
     img.save(buffered)
-    logging.info(f"QR code image saved for {code}")
+    logging.info(f"QR code generated for {code}")
 
     return buffered.getvalue()
 
@@ -426,7 +421,7 @@ def html_embed(name, code):
                             <tbody><tr>
                               <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
                                 <div style="font-family:Alata, sans-serif;font-size:18px;font-weight:400;line-height:24px;text-align:left;color:#434245;">
-                                  <p style="margin: 0;"><strong style="font-size: 14px; color: #999; line-height: 18px">When:</strong><br /> Wed, May 8th, 2024, 09:00 AM GMT+7</p>
+                                  <p style="margin: 0;"><strong style="font-size: 14px; color: #999; line-height: 18px">When:</strong><br /> Wed, Jun 5th, 2024, 09:00 AM GMT+7</p>
                                 </div>
                               </td>
                             </tr>
@@ -873,12 +868,9 @@ def send_email(code, name, email):
 @app.route(route="career_qr", auth_level=func.AuthLevel.ADMIN)
 def career_qr(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
-
     
     name = req.params.get('name')
     email = req.params.get('email')
-
-    logging.info(f"Name: {name}, Email: {email}")
 
     if not name or not email:
         try:
@@ -889,12 +881,27 @@ def career_qr(req: func.HttpRequest) -> func.HttpResponse:
             name = req_body.get('name')
             email = req_body.get('email')
 
+    if not name:
+        name = req.headers.get('name')
+    if not email:
+        email = req.headers.get('email')
+
+
+    if not name or not email:
+        data = req_body.get('data')
+        # logging.info(f"Data: {data}")
+        if data:
+            name = data['contact']['name']['first']
+            email = data['contact']['email']
+
+    logging.info(f"Name: {name}, Email: {email}")
+
     if not name or not email:
         return func.HttpResponse(
              "Please pass a name and email on the query string or in the request body",
              status_code=400
         )
-
+    
     # save to db
     connection_uri = os.environ["MONGO_URI"]
     client = MongoClient(connection_uri)
