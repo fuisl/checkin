@@ -166,3 +166,5 @@ dump/
 bin/test.ipynb
 
 /auto-reg
+
+token.txt
