@@ -84,14 +84,15 @@ class Scanner(ABC):
         pass
 
 class CodeScanner(CodeDetect, Scanner):
-    def __init__(self, event_code=None):
+    def __init__(self, cam_index, event_code=None):
         """
         Initialize CodeScanner class
 
         Parameter:
             :event_code: Event code to scan. It's a practice to declare event code.
         """
-        super().__init__()
+        super().__init__(index=cam_index)
+        
         # self._updater = Updater(event_code)
         
     def scan(self):
