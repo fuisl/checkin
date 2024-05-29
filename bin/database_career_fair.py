@@ -58,3 +58,17 @@ class Database():
         update_result = self.customer_collection.update_many(filter, update)
 
         return update_result.modified_count
+
+    def get_customer_info (self, checked_in:bool=False) -> list:
+        """
+        Return list of customers info based on checked_in field.
+        """
+
+        ret = None
+
+        if checked_in:
+            ret = list(self.customer_collection.find({"checked_in": checked_in}))
+        else:
+            ret = list(self.customer_collection.find({"checked_in": {"$exists": False}}))
+
+        return ret
